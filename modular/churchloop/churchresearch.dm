@@ -1604,9 +1604,9 @@ var/global/list/NOC_SECRET_MIRACLES = list(
 		return
 
 	var/list/rad = list()
-	rad["Learn"] = icon(icon = MIRACLE_RADIAL_DMI, icon_state = "learnmiracle")
-	rad["Research"] = icon(icon = MIRACLE_RADIAL_DMI, icon_state = "researchmiracle")
-	rad["Quests"] = icon(icon = MIRACLE_RADIAL_DMI, icon_state = "questmiracle")
+	rad["Learn"] = icon(icon = MIRACLE_RADIAL_DMI, icon_state = "recruit_acolyte")
+	rad["Research"] = icon(icon = MIRACLE_RADIAL_DMI, icon_state = "book1")
+	rad["Quests"] = icon(icon = MIRACLE_RADIAL_DMI, icon_state = "astrata")
 
 	var/choice = show_radial_menu(user, user, rad, require_near = FALSE)
 	if(choice == "Learn")

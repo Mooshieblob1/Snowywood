@@ -100,22 +100,25 @@ Malum's tool
 	. = ..()
 	if(!proximity_flag || !user || !user.used_intent)
 		return
-//only one bar items you retard
-	if(istype(target, /obj/machinery/anvil))
-		var/obj/machinery/anvil/A = target
-		var/obj/item/ingot/ing_on_anvil = A.vars["hingot"]
-		if(istype(ing_on_anvil, /obj/item/ingot))
-			A.vars["hingot"] = null
-			A.update_icon()
-			ing_on_anvil.forceMove(src)
-			forge_open_category_menu(user, ing_on_anvil)
+
+	if(istype(user.used_intent, /datum/intent/forge))
+		if(istype(target, /obj/machinery/anvil))
+			var/obj/machinery/anvil/A = target
+			var/obj/item/ingot/ing_on_anvil = A.vars["hingot"]
+			if(istype(ing_on_anvil, /obj/item/ingot))
+				A.vars["hingot"] = null
+				A.update_icon()
+				ing_on_anvil.forceMove(src)
+				forge_open_category_menu(user, ing_on_anvil)
+				return
+
+			to_chat(user, span_warning("Place an ingot on the anvil or click an ingot directly."))
 			return
-		to_chat(user, span_warning("Place an ingot on the anvil or click an ingot directly."))
-		return
 
 		if(!isitem(target))
 			to_chat(user, span_warning("I need to click an ingot to forge."))
 			return
+
 		var/obj/item/ingot/ing = target
 		if(!istype(ing, /obj/item/ingot))
 			to_chat(user, span_warning("[target] is not an ingot."))
@@ -170,16 +173,6 @@ Malum's tool
 		qdel(I2)
 
 		var/obj/item/last_ingot = null
-		for(var/i = 1, i <= yield, i++)
-			last_ingot = new smeltpath(T)
-
-		user.visible_message(
-			span_notice("[user] completes the smelting, revealing [yield] [last_ingot ? last_ingot.name : "ingot"](s)."),
-			span_notice("The smelting is done.")
-		)
-		playsound(T, 'sound/items/bsmith4.ogg', 70, FALSE)
-		user.changeNext_move(CLICK_CD_INTENTCAP)
-		return
 
 // CRAFT STARTTS HERE //
 

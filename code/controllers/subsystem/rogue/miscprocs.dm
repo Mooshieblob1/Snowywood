@@ -117,12 +117,12 @@
 		last_level = level
 	return TRUE
 
-/datum/devotion/proc/_is_clergy_radical(mob/living/carbon/human/H)
+/datum/devotion/proc/_is_clergy_radical(mob/living/carbon/human/H) //yes i know
 	if(!H)
 		return FALSE
 	return HAS_TRAIT(H, TRAIT_CLERGYRADICAL)
 
-/datum/devotion/proc/_is_learnmiracle_eligible(mob/living/carbon/human/H)
+/datum/devotion/proc/_is_learnmiracle_eligible(mob/living/carbon/human/H) //yes i know
 	if(!H || !H.mind)
 		return FALSE
 	return HAS_TRAIT(H, TRAIT_CLERGYRADICAL)
