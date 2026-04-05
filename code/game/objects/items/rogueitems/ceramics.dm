@@ -511,10 +511,22 @@
 // Raw teapot
 /obj/item/natural/clay/rawteapot
 	name = "raw teapot"
-	icon = 'icons/roguetown/items/cooking.dmi'
-	icon_state = "teapot_raw"
+	icon = 'modular/Neu_Food/icons/cookware/pot.dmi'
+	icon_state = "teapot_clay_raw"
 	desc = "A teapot fashioned from clay. Still needs to be baked to be useful."
 	obj_flags = UNIQUE_RENAME
+	cooked_type = /obj/item/reagent_containers/glass/bucket/pot/teapot/clay
+
+/obj/item/natural/clay/rawteapot/attackby(obj/item/W, mob/living/user, params)
+	if(istype(W, /obj/item/dye_brush) || istype(W, /obj/item/alch/golddust))
+		to_chat(user, span_warning("This clay teapot style can't be glazed with dye or gold dust."))
+		return TRUE
+	return ..()
+
+/obj/item/natural/clay/rawteapot/classic
+	name = "raw classic teapot"
+	icon = 'icons/roguetown/items/cooking.dmi'
+	icon_state = "teapot_raw"
 	cooked_type = /obj/item/reagent_containers/glass/bucket/pot/teapot
 
 // Raw teacup
@@ -1164,11 +1176,22 @@
 /obj/item/reagent_containers/glass/bucket/pot/teapot/porcelain/update_icon()
 	return FALSE // Teapots do not use pot fill overlays.
 
+/obj/item/reagent_containers/glass/bucket/pot/teapot/clay
+	name = "clay teapot"
+	desc = "A teapot made out of baked clay."
+	icon = 'modular/Neu_Food/icons/cookware/pot.dmi'
+	icon_state = "teapot_clay_baked"
+	pottery_fragile = TRUE
+	obj_flags = CAN_BE_HIT|UNIQUE_RENAME
+
 /obj/item/reagent_containers/glass/bucket/pot/claykettle
 	name = "clay kettle"
 	desc = "A kettle made out of baked clay."
 	icon = 'modular/Neu_Food/icons/cookware/pot.dmi'
 	icon_state = "claykettle_baked"
+	w_class = WEIGHT_CLASS_NORMAL
+	grid_width = 32
+	grid_height = 64
 	pottery_fragile = TRUE
 	obj_flags = CAN_BE_HIT|UNIQUE_RENAME
 	sellprice = 12
@@ -1179,6 +1202,9 @@
 	desc = "A kettle fired from refined clay."
 	icon = 'modular/Neu_Food/icons/cookware/pot.dmi'
 	icon_state = "porcelainkettle"
+	w_class = WEIGHT_CLASS_NORMAL
+	grid_width = 32
+	grid_height = 64
 	pottery_fragile = TRUE
 	obj_flags = CAN_BE_HIT|UNIQUE_RENAME
 	sellprice = 18

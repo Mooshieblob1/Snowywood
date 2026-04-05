@@ -37,8 +37,7 @@
 /obj/item/natural/clay/proc/select_special_glaze(obj/item/dye_brush/brush, mob/living/user)
 	if(!special_glaze_result_types?.len || !special_glaze_icon_states?.len)
 		return FALSE
-	if(!brush?.dye)
-		to_chat(user, span_warning("The dye brush has no dye loaded."))
+	if(!brush)
 		return TRUE
 	var/list/radial_choices = list()
 	for(var/choice_name in special_glaze_result_types)
@@ -48,11 +47,20 @@
 	if(!choice)
 		return TRUE
 	special_glaze_selected_type = special_glaze_result_types[choice]
-	has_glaze_gold_dust = FALSE
 	to_chat(user, span_notice("I prepare [src] for a [lowertext(choice)] finish."))
-	if(needs_glaze_gold_dust)
+	if(needs_glaze_gold_dust && !has_glaze_gold_dust)
 		to_chat(user, span_warning("I need to add gold dust before baking, or it will bake into a regular porcelain finish."))
+	else if(needs_glaze_gold_dust && has_glaze_gold_dust)
+		to_chat(user, span_notice("Gold dust is already added. This piece is ready to fire."))
 	return TRUE
+
+/obj/item/natural/clay/examine(mob/user)
+	. = ..()
+	if(special_glaze_result_types?.len)
+		if(needs_glaze_gold_dust)
+			. += span_info("Tip: While this piece is raw, add gold dust and use a dye brush with middle-click to choose its glaze style before firing.")
+		else
+			. += span_info("Tip: While this piece is raw, use a dye brush with middle-click to choose its glaze style before firing.")
 
 /obj/item/natural/clay/proc/consume_wetting_water(obj/item/reagent_containers/container)
 	if(!container?.reagents)
@@ -116,6 +124,15 @@
 			return TRUE
 	return ..()
 
+/obj/item/natural/clay/MiddleClick(mob/user, params)
+	if(!Adjacent(user))
+		return ..()
+	var/obj/item/dye_brush/brush = user?.get_active_held_item()
+	if(istype(brush))
+		if(select_special_glaze(brush, user))
+			return TRUE
+	return ..()
+
 /obj/item/natural/clay/kneaded
 	name = "kneaded clay"
 	desc = "Well-worked clay made pliable for pottery. Prepared by wetting two lumps of raw clay with a water source and thoroughly kneading them together until smooth. Requires: 2x raw clay, water. Worked at a potter's wheel into basic clayware."
@@ -171,9 +188,6 @@
 			return TRUE
 
 	if(istype(W, /obj/item/alch/golddust) && needs_glaze_gold_dust)
-		if(!special_glaze_selected_type)
-			to_chat(user, span_warning("I should choose a glaze style first."))
-			return TRUE
 		if(has_glaze_gold_dust)
 			to_chat(user, span_warning("This piece already has gold dust added."))
 			return TRUE
@@ -181,7 +195,9 @@
 			return TRUE
 		has_glaze_gold_dust = TRUE
 		qdel(W)
-		to_chat(user, span_notice("I dust [src] with gold, ready for firing."))
+		to_chat(user, span_notice("I dust [src] with gold, ready for firing. I should brush glaze onto it to make it fancier."))
+		if(!special_glaze_selected_type)
+			to_chat(user, span_info("I can still choose a glaze style with a dye brush before firing."))
 		return TRUE
 
 	var/found_table = locate(/obj/structure/table) in (loc)
@@ -361,6 +377,8 @@
 
 /obj/item/natural/clay/heating_act(atom/A)
 	var/obj/item/result
+	var/successful_gold_glaze = FALSE
+	var/successful_special_glaze = FALSE
 	if(istype(A,/obj/machinery/light/rogue/oven))
 		if(prob(shatter_chance))
 			if(A)
@@ -377,13 +395,37 @@
 						A.visible_message(span_notice("[src] bakes without enough gold and settles into a standard finish."))
 				else
 					target_cooked_type = special_glaze_selected_type
+					successful_special_glaze = TRUE
+					if(needs_glaze_gold_dust && has_glaze_gold_dust)
+						successful_gold_glaze = TRUE
 			result = new target_cooked_type(A)
-			apply_pottery_quality(result, pottery_quality, creator_skill)
+			if(successful_gold_glaze && result.sellprice)
+				result.sellprice = max(result.sellprice, round(initial(result.sellprice) * 2))
+			apply_pottery_quality(result, pottery_quality, creator_skill, istype(src, /obj/item/natural/clay/porcelain))
+			if(!istype(src, /obj/item/natural/clay/porcelain) && result.dropshrink < 1)
+				result.dropshrink = 1
+			if(successful_special_glaze)
+				var/glaze_floor_multiplier = 1.0
+				switch(pottery_quality)
+					if(2)
+						glaze_floor_multiplier = 1.2
+					if(3)
+						glaze_floor_multiplier = 1.4
+					if(4)
+						glaze_floor_multiplier = 1.6
+					if(5)
+						glaze_floor_multiplier = 2.0
+				var/min_glaze_value = round(80 * glaze_floor_multiplier)
+				if(!result.sellprice || result.sellprice < min_glaze_value)
+					result.sellprice = min_glaze_value
+				result.polished = 4
+				if(!result.GetComponent(/datum/component/metal_glint))
+					result.AddComponent(/datum/component/metal_glint)
 		return result
 	result = new /obj/item/ash(A) // No cooked_type? Pulverized.
 	return result
 
-/obj/item/natural/clay/proc/apply_pottery_quality(obj/item/result, quality_tier, creator_skill_level)
+/obj/item/natural/clay/proc/apply_pottery_quality(obj/item/result, quality_tier, creator_skill_level, source_is_porcelain = FALSE)
 	if(!result)
 		return
 	
@@ -417,6 +459,13 @@
 	// Apply quality multiplier to sell price
 	if(result.sellprice)
 		result.sellprice = round(result.sellprice * quality_multiplier)
+
+	// Non-porcelain clayware should stay meaningfully valuable and still scale with quality.
+	if(!source_is_porcelain && result.sellprice)
+		var/non_porcelain_min_base = 12
+		var/non_porcelain_min_value = round(non_porcelain_min_base * quality_multiplier)
+		if(result.sellprice < non_porcelain_min_value)
+			result.sellprice = non_porcelain_min_value
 	
 	// Add masterwork sparkling effect
 	if(quality_tier >= 4)

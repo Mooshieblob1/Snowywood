@@ -105,17 +105,14 @@
 			if(roll <= 65) return 1
 			return 0
 		if(SKILL_LEVEL_EXPERT)
-			if(roll <= 2) return 4
-			if(roll <= 30) return 3
-			if(roll <= 70) return 2
-			if(roll <= 90) return 1
-			return 0
+			if(roll <= 5) return 4
+			if(roll <= 35) return 3
+			return 2
 		if(SKILL_LEVEL_MASTER)
 			if(roll <= 20) return 5
 			if(roll <= 50) return 4
 			if(roll <= 80) return 3
-			if(roll <= 95) return 2
-			return 1
+			return 2
 	// SKILL_LEVEL_LEGENDARY (and any above)
 	if(roll <= 40) return 5
 	if(roll <= 70) return 4
@@ -206,15 +203,17 @@
 		var/ruin_chance = 0
 		switch(skill_level)
 			if(SKILL_LEVEL_NONE)
-				ruin_chance = 50
-			if(SKILL_LEVEL_NOVICE)
 				ruin_chance = 30
-			if(SKILL_LEVEL_APPRENTICE)
+			if(SKILL_LEVEL_NOVICE)
 				ruin_chance = 20
+			if(SKILL_LEVEL_APPRENTICE)
+				ruin_chance = 15
 			if(SKILL_LEVEL_JOURNEYMAN)
 				ruin_chance = 10
 			if(SKILL_LEVEL_EXPERT)
 				ruin_chance = 5
+		if(!istype(selected_recipe, /datum/pottery_wheel_recipe/porcelain) && skill_level < SKILL_LEVEL_EXPERT)
+			ruin_chance = max(1, round(ruin_chance * 0.5))
 		if(prob(ruin_chance))
 			user.visible_message(span_warning("[user] loses control of the clay on the wheel — it collapses!"), span_warning("I lose control of the spinning clay — it collapses and is ruined!"))
 			playsound(src, 'modular/Neu_Food/sound/kneading.ogg', 80, TRUE)
@@ -238,6 +237,8 @@
 	var/turf/drop_turf = get_turf(src)
 	for(var/spawn_i in 1 to selected_recipe.result_count)
 		var/obj/item/I = new selected_recipe.result_type(drop_turf)
+		if(istype(I, /obj/item/natural/clay) && !istype(I, /obj/item/natural/clay/porcelain))
+			I.dropshrink = 1
 		if(istype(I, /obj/item/natural/clay))
 			var/obj/item/natural/clay/clay_item = I
 			clay_item.creator_skill = skill_level
@@ -329,6 +330,17 @@
 	craftdiff = 0
 	base_time = 45
 	result_type = /obj/item/natural/clay/rawteapot
+	recipe_icon = 'modular/Neu_Food/icons/cookware/pot.dmi'
+	recipe_icon_state = "teapot_clay_raw"
+	required_clay_type = /obj/item/natural/clay/kneaded
+
+/datum/pottery_wheel_recipe/basic/teapot_classic
+	name = "classic teapot"
+	craftdiff = 0
+	base_time = 45
+	result_type = /obj/item/natural/clay/rawteapot/classic
+	recipe_icon = 'modular/Neu_Food/icons/cookware/pot.dmi'
+	recipe_icon_state = "teapot"
 	required_clay_type = /obj/item/natural/clay/kneaded
 
 /datum/pottery_wheel_recipe/basic/kettle
@@ -485,6 +497,8 @@
 /datum/pottery_wheel_recipe/porcelain/cup_alt
 	name = "porcelain cup"
 	result_type = /obj/item/natural/clay/porcelain/claycup
+	recipe_icon = 'modular/Neu_Food/icons/cookware/cup.dmi'
+	recipe_icon_state = "claycupraw"
 
 /datum/pottery_wheel_recipe/porcelain/mug
 	name = "porcelain mug"
@@ -526,8 +540,8 @@
 /datum/pottery_wheel_recipe/porcelain/fancy_teapot
 	name = "fancy porcelain teapot"
 	result_type = /obj/item/natural/clay/porcelain/fancyteapot
-	recipe_icon = 'modular/Neu_Food/icons/cookware/pot.dmi'
-	recipe_icon_state = "clayporcelainfancyteapot2"
+	recipe_icon = 'icons/roguetown/items/cooking.dmi'
+	recipe_icon_state = "teapot_raw"
 
 /datum/pottery_wheel_recipe/porcelain/dildo
 	name = "porcelain dildo"
@@ -568,6 +582,8 @@
 /datum/pottery_wheel_recipe/porcelain/advanced/fancy_cup
 	name = "fancy porcelain cup"
 	result_type = /obj/item/natural/clay/porcelain/fancycup
+	recipe_icon = 'icons/roguetown/items/cooking.dmi'
+	recipe_icon_state = "teacup_raw"
 
 /datum/pottery_wheel_recipe/porcelain/advanced/fancy_teacup
 	name = "fancy porcelain teacup"

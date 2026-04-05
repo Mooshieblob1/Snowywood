@@ -19,8 +19,8 @@
 	var/has_lid = FALSE
 	var/lid_icon_state = "potelid"
 	var/boiling_temperature_threshold = 374
-	var/lid_on_sound = 'sound/combat/hits/onmetal/sheet (2).ogg'
-	var/lid_off_sound = 'sound/combat/hits/onmetal/sheet (1).ogg'
+	var/lid_on_sound = 'sound/foley/dropsound/shovel_drop.ogg'
+	var/lid_off_sound = 'sound/items/uncork.ogg'
 
 /obj/item/reagent_containers/glass/bucket/pot/update_icon()
 	cut_overlays()
@@ -54,6 +54,9 @@
 		playsound(get_turf(src), lid_off_sound, 60, TRUE)
 	to_chat(user, has_lid ? span_notice("I cover [src] with its lid.") : span_notice("I remove the lid from [src]."))
 	update_icon()
+	if(istype(loc, /obj/machinery/light/rogue/hearth))
+		var/obj/machinery/light/rogue/hearth/hearth_loc = loc
+		hearth_loc.update_icon()
 	return TRUE
 
 /obj/item/reagent_containers/glass/bucket/pot/is_refillable()
