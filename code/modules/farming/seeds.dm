@@ -253,3 +253,62 @@
 /obj/item/seeds/eggplant
 	seed_identity = "eggplant seeds"
 	plant_def_type = /datum/plant_def/eggplant
+
+// -- Tree sapling seeds (Dendor druid content) ----------------------------
+// These bypass the soil plant_def system and directly grow /obj/structure/tree_sapling.
+// Require journeyman farming skill to use.
+
+/obj/item/seeds/treesap
+	name = "tree sapling"
+	desc = "A small, young tree. Plant it in prepared soil and keep it watered; a great tree may follow."
+	icon_state = "seed"
+	seed_identity = "tree seeds"
+
+/obj/item/seeds/treesap/attack_turf(turf/T, mob/living/user)
+	if(user.get_skill_level(/datum/skill/labor/farming) < SKILL_LEVEL_JOURNEYMAN)
+		to_chat(user, span_warning("I don't have the farming knowledge to tend a tree sapling."))
+		return
+	if(locate(/obj/structure/tree_sapling) in T)
+		to_chat(user, span_warning("There's already a sapling growing here."))
+		return
+	var/obj/structure/soil/existing_soil = locate(/obj/structure/soil) in T
+	if(!existing_soil && !istype(T, /turf/open/floor/rogue/dirt) && !istype(T, /turf/open/floor/rogue/grass))
+		to_chat(user, span_warning("I need to plant this in soil, on dirt, or on grass."))
+		return
+	to_chat(user, span_notice("I begin preparing the ground for the tree sapling..."))
+	if(!do_after(user, get_farming_do_time(user, 15 SECONDS), target = src))
+		return
+	apply_farming_fatigue(user, 40)
+	// Re-check after delay
+	if(locate(/obj/structure/tree_sapling) in T)
+		return
+	if(!locate(/obj/structure/soil) in T)
+		if(!istype(T, /turf/open/floor/rogue/dirt) && !istype(T, /turf/open/floor/rogue/grass))
+			return
+		new /obj/structure/soil(T)
+	plant_tree_sapling(T, user)
+
+/obj/item/seeds/treesap/proc/plant_tree_sapling(turf/T, mob/living/user)
+	new /obj/structure/tree_sapling(T)
+	to_chat(user, span_notice("I carefully plant the tree sapling and pat the soil down."))
+	qdel(src)
+
+/obj/item/seeds/treesap/pine
+	name = "pine sapling"
+	desc = "A small, resinous sapling. Plant it in prepared soil and it may grow into a tall pine tree."
+	seed_identity = "pine seeds"
+
+/obj/item/seeds/treesap/pine/plant_tree_sapling(turf/T, mob/living/user)
+	new /obj/structure/tree_sapling/pine(T)
+	to_chat(user, span_notice("I carefully plant the pine sapling and pat the soil down."))
+	qdel(src)
+
+/obj/item/seeds/treesap/sakura
+	name = "sakura sapling"
+	desc = "A small, pink-tinged sapling. Incredibly rare, and originally from distant lands Tend it faithfully and a blooming cherry tree will reward your patience."
+	seed_identity = "sakura seeds"
+
+/obj/item/seeds/treesap/sakura/plant_tree_sapling(turf/T, mob/living/user)
+	new /obj/structure/tree_sapling/sakura(T)
+	to_chat(user, span_notice("I carefully plant the sakura sapling and pat the soil down."))
+	qdel(src)
