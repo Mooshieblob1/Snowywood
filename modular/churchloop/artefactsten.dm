@@ -374,6 +374,8 @@ Necra's Censer (by ARefrigerator)
 	//  -1 = -100, 0 = off, 1 = +100
 	var/water_step_state = 1
 	var/nutri_step_state = 1
+	var/next_use_time = 0
+	var/use_cooldown = 60*10
 
 	var/auto_bless = TRUE
 
@@ -457,8 +459,15 @@ Necra's Censer (by ARefrigerator)
 	. = ..()
 	if(!proximity_flag || !istype(target, /obj/structure/soil))
 		return
+
+	if(world.time < next_use_time)
+		var/time_left = max(1, round((next_use_time - world.time) / 10))
+		to_chat(user, span_warning("The Endless Hose must rest for [time_left] more seconds."))
+		return
+
 	var/obj/structure/soil/S = target
 	apply_additives_to_soil(S, user)
+	next_use_time = world.time + use_cooldown
 
 /obj/item/artefact/dendor_hose/proc/apply_additives_to_soil(obj/structure/soil/S, mob/user)
 	var/w_delta = water_step_state * 100
@@ -1002,15 +1011,16 @@ Necra's Censer (by ARefrigerator)
 		return FIRE_MINIMUM_TEMPERATURE_TO_SPREAD
 	return ..()
 
+/obj/item/rogueweapon/surgery/multitool/proc/_is_passive_surgery_mode()
+	return current_mode in list("hemostat", "retractor", "bonesetter", "suture")
+
 /obj/item/rogueweapon/surgery/multitool/pre_attack(atom/A, mob/living/user, params)
-	if(!_is_use_intent(user) || !ishuman(A))
-		return ..()
+	if(ishuman(A) && (current_mode == "hemostat" || current_mode == "retractor"))
+		var/mob/living/carbon/human/H = A
+		var/obj/item/bodypart/part = _get_target_bodypart(H, user)
+		if(!part)
+			return TRUE
 
-	var/mob/living/carbon/human/H = A
-	var/obj/item/bodypart/part = _get_target_bodypart(H, user)
-	if(!part) return TRUE
-
-	if(current_mode == "hemostat" || current_mode == "retractor")
 		if(!(part.get_surgery_flags() & SURGERY_INCISED))
 			to_chat(user, span_warning("I need an incision first."))
 			return TRUE
@@ -1039,7 +1049,11 @@ Necra's Censer (by ARefrigerator)
 			playsound(H, 'sound/foley/equip/swordsmall2.ogg', 50, FALSE)
 		else
 			qdel(S)
+
 		return TRUE
+
+	if(!_is_use_intent(user) || !ishuman(A))
+		return ..()
 
 	return ..()
 
@@ -1052,6 +1066,8 @@ Necra's Censer (by ARefrigerator)
 		if(current_mode == "retractor" && embedded.tool_behaviour == TOOL_RETRACTOR)
 			return TRUE
 	return FALSE
+
+
 
 
 

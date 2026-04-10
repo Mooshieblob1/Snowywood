@@ -65,7 +65,7 @@
 		return
 
 	ADD_TRAIT(H, TRAIT_CLERGYRADICAL, "job")
-	H.miracle_points += 7
+	H.church_favor += 2000
 
 	var/datum/devotion/C = new /datum/devotion(H, H.patron)
 	C.grant_miracles(H, cleric_tier = CLERIC_T4, passive_gain = CLERIC_REGEN_MAJOR, start_maxed = TRUE)
@@ -81,7 +81,7 @@
 		if(!H.mind.has_spell(/obj/effect/proc_holder/spell/invoked/projectile/divineblast))
 			H.mind.AddSpell(new /obj/effect/proc_holder/spell/invoked/projectile/divineblast, H)			
 
-	to_chat(H, span_notice("I embrace the radical path. (+7 Miracle Points)"))
+	to_chat(H, span_notice("I embrace the radical path."))
 
 /datum/job/roguetown/monk/proc/_delayed_path_choice(mob/living/carbon/human/H)
 	if(!H || !H.client || !H.mind)

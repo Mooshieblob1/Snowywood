@@ -497,12 +497,31 @@ var/global/list/Q_WITNESS_EFFECTS = list(
 		owner_ckey = ckey(H.key)
 	owner_name = H.real_name || H.name || owner_ckey
 
+/obj/item/quest_token/proc/_find_owner_mob()
+	if(!length(owner_ckey))
+		return null
+	for(var/mob/living/carbon/human/H in world)
+		if(H.client && H.client.ckey == owner_ckey)
+			return H
+	return null
+
 /obj/item/quest_token/proc/_payout(amount, mob/living/carbon/human/completer)
 	if(!amount) return
 	if(!istype(completer, /mob/living/carbon/human)) return
 
-	completer.church_favor += amount
-	to_chat(completer, span_notice("+[amount] Favor for completing a miracle quest."))
+	var/mob/living/carbon/human/receiver = _find_owner_mob()
+
+	if(!receiver)
+		to_chat(completer, span_warning("Owner of this quest token is absent. No favor is awarded."))
+		return
+
+	receiver.church_favor += amount
+
+	if(receiver == completer)
+		to_chat(receiver, span_notice("+[amount] Favor for completing a miracle quest."))
+	else
+		to_chat(completer, span_notice("The reward is credited to [owner_name]."))
+		to_chat(receiver, span_notice("+[amount] Favor from a completed quest token you created."))
 
 /obj/item/quest_token/proc/_ensure_attacker(user)
 	if(!istype(user, /mob/living/carbon/human))

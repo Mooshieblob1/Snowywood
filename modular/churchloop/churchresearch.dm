@@ -4,7 +4,7 @@
 #define MIRACLE_RADIAL_DMI 'icons/mob/actions/roguespells.dmi'
 
 #ifndef QUEST_COOLDOWN_DS
-#define QUEST_COOLDOWN_DS (10*60*30)
+#define QUEST_COOLDOWN_DS (10*60*20)
 #endif
 
 #ifndef CLERIC_PRICE_PATRON
@@ -74,7 +74,7 @@ var/global/list/PATRON_ARTIFACTS = list(
 	"Ravox"   = list(/obj/item/artifact/ravox_lens),
 	"Necra"   = list(/obj/item/artefact/necra_censer),
 /*	"Xylix"   = list(/obj/item/clothing/gloves/xylix), */
-	"Pestra"  = list(/* /obj/item/rogueweapon/surgery/multitool, */ /obj/item/needle/pestra, /obj/item/natural/worms/leech/cheele),
+	"Pestra"  = list(/obj/item/rogueweapon/surgery/multitool, /obj/item/needle/pestra, /obj/item/natural/worms/leech/cheele),
 	"Malum"   = list(/obj/item/rogueweapon/hammer/artefact/malum),
 	"Eora"    = list(/obj/item/artefact/eora_heart),
 )
@@ -98,7 +98,7 @@ var/global/list/NOC_SECRET_MIRACLES = list(
 	)
 )
 
-/// helpa 
+/// helpa
 
 /proc/_cr_html_attr(t as text)
 	if(!istext(t))
@@ -789,7 +789,7 @@ var/global/list/NOC_SECRET_MIRACLES = list(
 	html += "<table width='100%' cellspacing='2' cellpadding='2'>"
 	html += "<tr><th align='left'>Study</th><th width='120'>Status</th><th width='220'>Action</th></tr>"
 
-	html += "<tr><td>Secrets of Noc</td><td>[status_yn(H.unlocked_research_noc_secrets)]</td><td align='center'>"
+	/* html += "<tr><td>Secrets of Noc</td><td>[status_yn(H.unlocked_research_noc_secrets)]</td><td align='center'>"
 	if(!H.unlocked_research_noc_secrets)
 		if(H.church_favor >= RESEARCH_UNLOCK_FAVOR)
 			html += "<a href='?src=[REF(src)];unlockresearch=noc'>Unlock ([RESEARCH_UNLOCK_FAVOR] Favor)</a>"
@@ -797,7 +797,7 @@ var/global/list/NOC_SECRET_MIRACLES = list(
 			html += "<span style='color:#7f8c8d'>Unlock ([RESEARCH_UNLOCK_FAVOR] Favor)</span>"
 	else
 		html += "<span style='color:#7f8c8d'>See Learn tab</span>"
-	html += "</td></tr>"
+	html += "</td></tr>" */
 
 	html += "<tr><td>Fleshcraft of Pestra</td><td>[status_yn(H.unlocked_research_pestra_fleshcraft)]</td><td align='center'>"
 	if(!H.unlocked_research_pestra_fleshcraft)
@@ -1264,9 +1264,9 @@ var/global/list/NOC_SECRET_MIRACLES = list(
 		return
 
 	if(href_list["buynoc"])
-		if(!H.unlocked_research_noc_secrets)
-			open_learn_ui(H)
-			return
+		to_chat(H, span_warning("Secrets of Noc are disabled."))
+		open_learn_ui(H)
+		return
 
 		if(!H.mind)
 			open_learn_ui(H)
