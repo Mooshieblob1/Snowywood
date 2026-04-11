@@ -188,6 +188,7 @@
 				return
 			newrate = CLAMP(newrate, 0, D.generation_max)
 			scom_announce("Rotwood Vale will now import [D.passive_generation] [D.name] every 5 hours.")
+			D.passive_generation = newrate
 	if(href_list["setlimit"])
 		var/datum/roguestock/D = locate(href_list["setlimit"]) in SStreasury.stockpile_datums
 		if(!D)
@@ -444,7 +445,7 @@
 					contents += " || SELL: <a href='?src=\ref[src];setbounty=\ref[A]'>[A.payout_price]m</a>"
 					contents += " / BUY: <a href='?src=\ref[src];setprice=\ref[A]'>[A.withdraw_price]m</a>"
 					contents += " / LIMIT: <a href='?src=\ref[src];setlimit=\ref[A]'>[A.stockpile_limit]</a>"
-					if(!no_passive)
+					if(!A.no_passive)
 						contents += " / R.P.I.R.: <a href='?src=\ref[src];setrate=\ref[A]'>[A.passive_generation] ([A.generation_price]m)</a>"
 					if(!A.export_only)
 						if(A.importexport_amt)
@@ -476,7 +477,7 @@
 					contents += "Stockpiled Amount (Remote): [A.held_items[2]]<BR>"
 					contents += "Bounty Price: <a href='?src=\ref[src];setbounty=\ref[A]'>[A.payout_price]</a><BR>"
 					contents += "Withdraw Price: <a href='?src=\ref[src];setprice=\ref[A]'>[A.withdraw_price]</a><BR>"
-					if(!no_passive)
+					if(!A.no_passive)
 						contents += "Remote Passive Import Rate: <a href='?src=\ref[src];setrate=\ref[A]'>[A.passive_generation]</a><BR>"
 						contents += "R.P.I.R. Price: [A.generation_price] | Total Rate Price: [A.generation_price * A.passive_generation]<BR>"
 					contents += "Demand: [A.demand2word()]<BR>"
