@@ -4,6 +4,8 @@
 	footstep_type = FOOTSTEP_MOB_CLAW
 	ambushable = FALSE
 	skin_armor = new /obj/item/clothing/suit/roguetown/armor/skin_armor/moss_skin
+	wildshape_icon = 'icons/roguetown/mob/monster/mosscrawler.dmi'
+	wildshape_icon_state = "mole_briars"
 
 /mob/living/carbon/human/species/wildshape/dendormole/death(gibbed, nocutscene = FALSE)
 	wildshape_untransform(TRUE, gibbed)
@@ -159,7 +161,6 @@
 	w_class = WEIGHT_CLASS_NORMAL
 	can_parry = TRUE 
 	sharpness = IS_SHARP
-	parrysound = "bladedmedium"
 	swingsound = list('sound/vo/mobs/vw/attack (1).ogg','sound/vo/mobs/vw/attack (2).ogg','sound/vo/mobs/vw/attack (3).ogg','sound/vo/mobs/vw/attack (4).ogg')
 	possible_item_intents = list(/datum/intent/simple/mole, /datum/intent/simple/mole/dig, /datum/intent/pick)
 	parrysound = list('sound/combat/parry/parrygen.ogg')
@@ -173,10 +174,19 @@
 /obj/item/rogueweapon/mole_claw/left
 	icon_state = "claw_l"
 
-/obj/item/rogueweapon/mole_claw/Initialize()
+/obj/item/rogueweapon/mole_claw/Initialize(mapload)
 	. = ..()
-	ADD_TRAIT(src, TRAIT_NODROP, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOEMBED, TRAIT_GENERIC)
+
+/obj/item/rogueweapon/mole_claw/attack_self(mob/living/user)
+	var/obj/item/rogueweapon/mole_claw/active = user.get_active_held_item()
+	var/obj/item/rogueweapon/mole_claw/inactive = user.get_inactive_held_item()
+	if(active)
+		user.dropItemToGround(active, TRUE)
+		qdel(active)
+	if(inactive && inactive != active)
+		user.dropItemToGround(inactive, TRUE)
+		qdel(inactive)
 
 /obj/effect/proc_holder/spell/self/moleclaw
 	name = "Burrow Claws"

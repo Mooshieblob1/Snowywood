@@ -258,7 +258,15 @@
 		target.emote("agony")
 		target.Unconscious(200)
 		target.Knockdown(200)
-		target.mind?.AddSpell(new /obj/effect/proc_holder/spell/targeted/shapeshift/dendormole)
+		var/obj/effect/proc_holder/spell/self/wildshape/ws = target.mind?.get_spell(/obj/effect/proc_holder/spell/self/wildshape)
+		if(ws)
+			var/form_path = /mob/living/carbon/human/species/wildshape/dendormole
+			if(!(form_path in ws.possible_shapes))
+				ws.possible_shapes += form_path
+				to_chat(target, span_notice("The Moss Crawler form stirs within my soul..."))
+				addtimer(CALLBACK(src, PROC_REF(remove_ritual_form), target, form_path), 30 MINUTES)
+		else
+			to_chat(target, span_warning("I lack the Beast Form ability to channel this power..."))
 
 /obj/structure/ritualcircle/dendor/proc/spiderkinship(src)
 	var/ritualtargets = view(1, loc)
@@ -271,7 +279,24 @@
 		target.emote("agony")
 		target.Unconscious(100)
 		target.Knockdown(200)
-		target.mind?.AddSpell(new /obj/effect/proc_holder/spell/targeted/shapeshift/mireboi)
+		var/obj/effect/proc_holder/spell/self/wildshape/ws = target.mind?.get_spell(/obj/effect/proc_holder/spell/self/wildshape)
+		if(ws)
+			var/form_path = /mob/living/carbon/human/species/wildshape/mirecrawler
+			if(!(form_path in ws.possible_shapes))
+				ws.possible_shapes += form_path
+				to_chat(target, span_notice("The Mire Crawler form stirs within my soul..."))
+				addtimer(CALLBACK(src, PROC_REF(remove_ritual_form), target, form_path), 30 MINUTES)
+		else
+			to_chat(target, span_warning("I lack the Beast Form ability to channel this power..."))
+
+/// Removes a temporary ritual form from the druid's Beast Form wheel when the duration expires.
+/obj/structure/ritualcircle/dendor/proc/remove_ritual_form(mob/living/carbon/human/target, form_path)
+	if(QDELETED(target) || !target.mind)
+		return
+	var/obj/effect/proc_holder/spell/self/wildshape/ws = target.mind.get_spell(/obj/effect/proc_holder/spell/self/wildshape)
+	if(ws && (form_path in ws.possible_shapes))
+		ws.possible_shapes -= form_path
+		to_chat(target, span_warning("The borrowed form fades from my soul..."))
 
 
 

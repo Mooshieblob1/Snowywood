@@ -160,8 +160,17 @@
 
 /obj/item/rogueweapon/bear_claw/Initialize(mapload)
 	. = ..()
-	ADD_TRAIT(src, TRAIT_NODROP, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOEMBED, TRAIT_GENERIC)
+
+/obj/item/rogueweapon/bear_claw/attack_self(mob/living/user)
+	var/obj/item/rogueweapon/bear_claw/active = user.get_active_held_item()
+	var/obj/item/rogueweapon/bear_claw/inactive = user.get_inactive_held_item()
+	if(active)
+		user.dropItemToGround(active, TRUE)
+		qdel(active)
+	if(inactive && inactive != active)
+		user.dropItemToGround(inactive, TRUE)
+		qdel(inactive)
 
 // BEAR SPELLS //
 /obj/effect/proc_holder/spell/self/bearclaws

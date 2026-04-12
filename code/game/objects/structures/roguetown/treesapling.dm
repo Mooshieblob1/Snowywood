@@ -32,8 +32,8 @@
 	var/growth_progress = 0
 	var/dead = FALSE
 	var/obj/structure/soil/linked_soil
-	var/soil_water_drain = 1.5 / (1 MINUTES)
-	var/soil_nutrition_drain = 1.0 / (1 MINUTES)
+	var/soil_water_drain = 3.0 / (1 MINUTES)
+	var/soil_nutrition_drain = 2.0 / (1 MINUTES)
 	var/has_grown = FALSE   // prevents death before first watering
 
 	// What tree to spawn when fully grown
@@ -101,6 +101,10 @@
 		if(TREESAP_STAGE_SHRUB)
 			icon = stage2_icon
 			icon_state = stage2_state
+			max_integrity = 100
+			obj_integrity = 100
+			static_debris = list(/obj/item/natural/fibers = 1, /obj/item/grown/log/tree/stick = 1)
+			destroy_sound = "plantcross"
 		if(TREESAP_STAGE_YOUNG)
 			for(var/obj/structure/soil/S in get_turf(src))
 				qdel(S)
@@ -115,6 +119,7 @@
 			obj_integrity = 150
 			blade_dulling = DULLING_CUT
 			attacked_sound = 'sound/misc/woodhit.ogg'
+			destroy_sound = 'sound/misc/treefall.ogg'
 		if(4)
 			spawn_final_tree()
 
@@ -151,6 +156,16 @@
 			. += span_info("A small shrub growing steadily.")
 		if(TREESAP_STAGE_YOUNG)
 			. += span_notice("A young tree still taking root. It should grow on its own now.")
+	// Expert farmers and seed-knowers (druids) can read the estimated time to the next growth stage.
+	if(!dead && isliving(user))
+		var/mob/living/living_user = user
+		if(living_user.get_skill_level(/datum/skill/labor/farming) >= SKILL_LEVEL_EXPERT || HAS_TRAIT(living_user, TRAIT_SEEDKNOW))
+			if(stage <= TREESAP_STAGE_SHRUB && linked_soil && !QDELETED(linked_soil))
+				var/time_remaining = max(TREESAP_STAGE_TIME - growth_progress, 0)
+				. += span_info("Estimated time to next stage: [DisplayTimeText(time_remaining)].")
+			else if(stage == TREESAP_STAGE_YOUNG)
+				var/time_remaining = max(TREESAP_YOUNG_TIME - growth_progress, 0)
+				. += span_info("Estimated time to finish growing: [DisplayTimeText(time_remaining)].")
 	if(stage <= TREESAP_STAGE_SHRUB)
 		if(linked_soil && !QDELETED(linked_soil))
 			if(linked_soil.water <= 45)

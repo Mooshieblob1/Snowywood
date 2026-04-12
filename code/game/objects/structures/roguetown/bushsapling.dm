@@ -35,8 +35,8 @@
 	var/growth_progress = 0
 	var/dead = FALSE
 	var/obj/structure/soil/linked_soil
-	var/soil_water_drain = 1.5 / (1 MINUTES)
-	var/soil_nutrition_drain = 1.0 / (1 MINUTES)
+	var/soil_water_drain = 3.0 / (1 MINUTES)
+	var/soil_nutrition_drain = 2.0 / (1 MINUTES)
 
 	// Stage-3 loot, mirrors /obj/structure/flora/roguegrass/bush
 	var/bushtype = null
@@ -112,9 +112,10 @@
 			icon = 'icons/roguetown/misc/foliage.dmi'
 			icon_state = "bush2"
 			// Match regular wild bush integrity and add blade dulling
-			max_integrity = 35
-			obj_integrity = 35
+			max_integrity = 100
+			obj_integrity = 100
 			blade_dulling = DULLING_CUT
+			destroy_sound = "plantcross"
 		if(4)
 			spawn_hedge()
 
@@ -161,6 +162,13 @@
 				. += span_warning("It is looking overgrown. Shear it soon, or it will become a tall hedge in [DisplayTimeText(time_to_hedge)].")
 			else
 				. += span_notice("A mature bush. Shear it with scissors to keep it manageable, or leave it to grow into a taller hedge in [DisplayTimeText(time_to_hedge)].")
+	// Expert farmers and seed-knowers (druids) can read the estimated time to the next growth stage.
+	if(!dead && stage < BUSHSAP_STAGE_MATURE && isliving(user))
+		var/mob/living/living_user = user
+		if(living_user.get_skill_level(/datum/skill/labor/farming) >= SKILL_LEVEL_EXPERT || HAS_TRAIT(living_user, TRAIT_SEEDKNOW))
+			if(linked_soil && !QDELETED(linked_soil))
+				var/time_remaining = max(BUSHSAP_STAGE_TIME - growth_progress, 0)
+				. += span_info("Estimated time to next stage: [DisplayTimeText(time_remaining)].")
 	if(stage <= BUSHSAP_STAGE_BUDDING)
 		if(linked_soil && !QDELETED(linked_soil))
 			if(linked_soil.water <= 45)

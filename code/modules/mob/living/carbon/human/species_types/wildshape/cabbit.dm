@@ -43,6 +43,12 @@
 		return ..()
 	return TRUE // Mobs can always pass through cabbits
 
+/mob/living/carbon/human/species/wildshape/cabbit/start_pulling(atom/movable/AM, state, force, supress_message, obj/item/item_override)
+	if(ismob(AM))
+		to_chat(src, span_warning("My tiny paws can't grab that!"))
+		return FALSE
+	return ..()
+
 // CABBIT SPECIES DATUM //
 /datum/species/shapecabbit
 	name = "cabbit"
@@ -158,8 +164,17 @@
 
 /obj/item/rogueweapon/cabbit_claw/Initialize(mapload)
 	. = ..()
-	ADD_TRAIT(src, TRAIT_NODROP, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOEMBED, TRAIT_GENERIC)
+
+/obj/item/rogueweapon/cabbit_claw/attack_self(mob/living/user)
+	var/obj/item/rogueweapon/cabbit_claw/active = user.get_active_held_item()
+	var/obj/item/rogueweapon/cabbit_claw/inactive = user.get_inactive_held_item()
+	if(active)
+		user.dropItemToGround(active, TRUE)
+		qdel(active)
+	if(inactive && inactive != active)
+		user.dropItemToGround(inactive, TRUE)
+		qdel(inactive)
 
 // CABBIT SPELLS //
 /obj/effect/proc_holder/spell/self/cabbitclaws

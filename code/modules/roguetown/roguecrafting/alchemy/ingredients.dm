@@ -118,10 +118,10 @@
 //==============================================================================
 /obj/item/alch/bloomstone
 	name = "harvest bloomstone"
-	desc = "A smooth river stone suffused with the Treefather's living power. When held during a Bless Crops miracle it spends a charge instead of being consumed — good for twenty uses before it shatters."
-	icon = 'icons/roguetown/items/produce.dmi'
-	icon_state = "flour"
-	color = "#73c47a"
+	desc = "A smooth stone suffused with the Treefather's living power. When held during while using the Bless Crops miracle it functions like blessed seed powder and spends a charge instead of being consumed — good for twenty uses before it shatters."
+	icon = 'icons/roguetown/gems/gem_shell.dmi'
+	icon_state = "cutgem_shell"
+	color = "#228B22"
 	major_pot = null
 	med_pot = null
 	minor_pot = null

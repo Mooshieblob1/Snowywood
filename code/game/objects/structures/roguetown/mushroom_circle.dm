@@ -127,6 +127,7 @@ GLOBAL_LIST_EMPTY(mushroom_circles)
 	desc = "A magical ring of pale and purple mushrooms that pulse with faint light. Druids of Dendor use these as waypoints to travel across long distances instantly."
 	max_integrity = 200
 	attacked_sound = 'sound/misc/woodhit.ogg'
+	destroy_sound = "plantcross"
 
 	/// Seconds since last scissors maintenance
 	var/maintenance_elapsed = 0
@@ -171,8 +172,8 @@ GLOBAL_LIST_EMPTY(mushroom_circles)
 	icon_state = "mushroomcluster"
 	desc = "A withered ring of mushrooms that has lost its fey connection."
 	visible_message(span_warning("[src] begins to wither — the mystical light flickers and dies."))
-	decay_finish_time = world.time + 10 MINUTES
-	decay_timerid = addtimer(CALLBACK(src, PROC_REF(final_decay)), 10 MINUTES, flags = TIMER_STOPPABLE)
+	decay_finish_time = world.time + 5 MINUTES
+	decay_timerid = addtimer(CALLBACK(src, PROC_REF(final_decay)), 5 MINUTES, flags = TIMER_STOPPABLE)
 
 /obj/structure/mushroom_circle/fey/proc/final_decay()
 	if(QDELETED(src))
@@ -184,7 +185,7 @@ GLOBAL_LIST_EMPTY(mushroom_circles)
 	. = ..()
 	if(!active)
 		var/time_to_final_decay = max(decay_finish_time - world.time, 0)
-		. += span_warning("The circle has lost its power. Its fey connection is severed — it will collapse in [DisplayTimeText(time_to_final_decay)].")
+		. += span_warning("The circle has lost its power and has become overgrown. Its fey connection is severed — it will collapse in [DisplayTimeText(time_to_final_decay)].")
 		return
 	var/time_to_overgrowth = max((20 MINUTES) - maintenance_elapsed, 0)
 	if(maintenance_elapsed > (15 MINUTES))
@@ -200,8 +201,9 @@ GLOBAL_LIST_EMPTY(mushroom_circles)
 				. += span_warning("The fey's mysteries are beyond my current understanding — I need greater druidic training to commune with this circle.")
 
 /obj/structure/mushroom_circle/fey/attackby(obj/item/I, mob/living/user, params)
-	// Require at least expert Druidic Trickery to interact with fey circle mechanics.
-	if(ishuman(user))
+	// Only block fey circle USE actions from low-skill users — attacking/chopping is always allowed.
+	var/is_fey_use = istype(I, /obj/item/natural/feather) || istype(I, /obj/item/clothing/neck/roguetown/psicross/dendor) || (istype(I, /obj/item/rogueweapon/huntingknife/scissors) && user.used_intent.type == /datum/intent/snip)
+	if(is_fey_use && ishuman(user))
 		var/mob/living/carbon/human/H = user
 		if(H.get_skill_level(/datum/skill/magic/druidic) < SKILL_LEVEL_EXPERT)
 			to_chat(user, span_warning("The fey magic in this circle is beyond my understanding — I need greater druidic training to commune with it."))
@@ -248,6 +250,11 @@ GLOBAL_LIST_EMPTY(mushroom_circles)
 	return ..()
 
 /obj/structure/mushroom_circle/fey/proc/open_teleport_menu(mob/living/user)
+	// 30-second per-user cooldown between fey circle uses.
+	if(world.time < (user.mob_timers["feycircle_cooldown"] + 30 SECONDS))
+		var/remaining = (user.mob_timers["feycircle_cooldown"] + 30 SECONDS) - world.time
+		to_chat(user, span_warning("I must wait [DisplayTimeText(remaining)] before the fey energy recharges inside the ring."))
+		return
 	if(get_turf(user) != get_turf(src))
 		to_chat(user, span_warning("I must stand within the mushroom circle to traverse the fey paths."))
 		return
@@ -290,3 +297,4 @@ GLOBAL_LIST_EMPTY(mushroom_circles)
 	playsound(dest_turf, 'sound/misc/portalopen.ogg', 50, FALSE)
 
 	to_chat(user, span_notice("I step into the ring, planting my feet firmly and emerge at [dest.name]."))
+	user.mob_timers["feycircle_cooldown"] = world.time

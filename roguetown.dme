@@ -2244,6 +2244,7 @@
 #include "code\modules\mob\living\carbon\human\species_types\roguetown\other\orc.dm"
 #include "code\modules\mob\living\carbon\human\species_types\roguetown\other\tiefling.dm"
 #include "code\modules\mob\living\carbon\human\species_types\roguetown\other\werewolf.dm"
+#include "code\modules\mob\living\carbon\human\species_types\wildshape\batcrow.dm"
 #include "code\modules\mob\living\carbon\human\species_types\wildshape\bear.dm"
 #include "code\modules\mob\living\carbon\human\species_types\wildshape\cabbit.dm"
 #include "code\modules\mob\living\carbon\human\species_types\wildshape\cat.dm"

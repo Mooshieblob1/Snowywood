@@ -88,7 +88,10 @@
 
 /obj/structure/flora/roguetree/proc/reinvigorate_tree(mob/user)
 	if(type == /obj/structure/flora/roguetree)
-		return spawn_reinvigorated_tree()
+		spawn_reinvigorated_tree()
+		if(isliving(user) && user.mind)
+			user.mind.add_sleep_experience(/datum/skill/magic/druidic, 20)
+		return TRUE
 	return FALSE
 
 /obj/structure/flora/roguetree/proc/spawn_reinvigorated_tree()
@@ -123,8 +126,8 @@
 	// Evil trees cleansed by Dendor's blessing become sanctified, not merely regrown.
 	new /obj/structure/flora/roguetree/wise/sanctified(T)
 	qdel(src)
-	if(isliving(user))
-		user.adjust_experience(/datum/skill/magic/druidic, 15, FALSE)
+	if(isliving(user) && user.mind)
+		user.mind.add_sleep_experience(/datum/skill/magic/druidic, 50)
 	return TRUE
 
 /obj/structure/flora/roguetree/wise
@@ -165,10 +168,14 @@
 	target.throw_at(throw_target, 4, 2)
 	target.adjustBruteLoss(8)
 
+/obj/structure/flora/roguetree/wise
+	var/examine_plays_music = TRUE
+
 /obj/structure/flora/roguetree/wise/examine(mob/user)
 	. = ..()
-	SEND_SOUND(usr, sound(null))
-	playsound(user, 'sound/music/tree.ogg', 80)
+	if(examine_plays_music)
+		SEND_SOUND(usr, sound(null))
+		playsound(user, 'sound/music/tree.ogg', 80)
 
 /obj/structure/flora/roguetree/wise/bless_tree(mob/user)
 	if(obj_integrity < max_integrity)
@@ -184,8 +191,8 @@
 	var/turf/T = get_turf(src)
 	new /obj/structure/flora/roguetree/wise/sanctified/wise(T)
 	qdel(src)
-	if(isliving(user))
-		user.adjust_experience(/datum/skill/magic/druidic, 15, FALSE)
+	if(isliving(user) && user.mind)
+		user.mind.add_sleep_experience(/datum/skill/magic/druidic, 50)
 	return TRUE
 
 /obj/structure/flora/roguetree/wise/proc/notify_nearby_dendorites()
@@ -229,7 +236,10 @@
 	icon_state = "t[rand(1,4)]"
 
 /obj/structure/flora/roguetree/burnt/reinvigorate_tree(mob/user)
-	return spawn_reinvigorated_tree()
+	spawn_reinvigorated_tree()
+	if(isliving(user) && user.mind)
+		user.mind.add_sleep_experience(/datum/skill/magic/druidic, 20)
+	return TRUE
 
 /obj/structure/flora/roguetree/stump/burnt
 	name = "tree stump"
@@ -407,7 +417,8 @@
 	layer = ABOVE_ALL_MOB_LAYER
 	var/res_replenish
 	blade_dulling = DULLING_CUT
-	max_integrity = 35
+	max_integrity = 100
+	destroy_sound = "plantcross"
 	climbable = FALSE
 	dir = SOUTH
 	debris = list(/obj/item/natural/fibers = 1, /obj/item/grown/log/tree/stick = 1, /obj/item/natural/thorn = 2)
@@ -922,4 +933,6 @@
 	var/turf/tree_turf = get_turf(src)
 	new /obj/structure/flora/roguetree/pine(tree_turf)
 	qdel(src)
+	if(isliving(user) && user.mind)
+		user.mind.add_sleep_experience(/datum/skill/magic/druidic, 20)
 	return TRUE

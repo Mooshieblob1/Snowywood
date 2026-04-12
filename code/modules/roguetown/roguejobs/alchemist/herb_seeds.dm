@@ -145,6 +145,12 @@
 			. += span_info("The soil beneath it is sated.")
 		else
 			. += span_info("The soil beneath it looks fertile.")
+		// Expert farmers and seed-knowers (druids) can read the estimated time until this seedling blooms.
+		if(isliving(user))
+			var/mob/living/living_user = user
+			if(living_user.get_skill_level(/datum/skill/labor/farming) >= SKILL_LEVEL_EXPERT || HAS_TRAIT(living_user, TRAIT_SEEDKNOW))
+				var/time_remaining = max(grow_duration - growth_progress, 0)
+				. += span_info("Estimated time to bloom: [DisplayTimeText(time_remaining)].")
 
 /obj/structure/soil_seedling/proc/bloom()
 	if(QDELETED(src) || !ispath(final_type))

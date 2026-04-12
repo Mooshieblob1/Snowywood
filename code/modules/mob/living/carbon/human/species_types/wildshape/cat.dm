@@ -120,7 +120,7 @@
 	item_state = null
 	lefthand_file = null
 	righthand_file = null
-	icon = 'icons/roguetown/weapons/unarmed32.dmi'
+	icon = 'icons/roguetown/weapons/misc32.dmi'
 	max_blade_int = 200
 	max_integrity = 200
 	force = 8 //Pitiful, literally less than a wooden stick or a thrown toy
@@ -148,8 +148,17 @@
 
 /obj/item/rogueweapon/cat_claw/Initialize(mapload)
 	. = ..()
-	ADD_TRAIT(src, TRAIT_NODROP, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOEMBED, TRAIT_GENERIC)
+
+/obj/item/rogueweapon/cat_claw/attack_self(mob/living/user)
+	var/obj/item/rogueweapon/cat_claw/active = user.get_active_held_item()
+	var/obj/item/rogueweapon/cat_claw/inactive = user.get_inactive_held_item()
+	if(active)
+		user.dropItemToGround(active, TRUE)
+		qdel(active)
+	if(inactive && inactive != active)
+		user.dropItemToGround(inactive, TRUE)
+		qdel(inactive)
 
 // CAT SPELLS //
 /obj/effect/proc_holder/spell/self/catclaws

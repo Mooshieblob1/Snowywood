@@ -403,7 +403,7 @@
 		return
 	flower_sprout_type = options[choice]
 	flower_name = choice
-	name = "[lowertext(choice)] seeds"
+	name = "[LOWER_TEXT(choice)] seeds"
 	to_chat(user, span_notice("I sort the seeds to cultivate [flower_name]."))
 
 /obj/item/seeds/flower/attack_turf(turf/T, mob/living/user)
@@ -447,14 +447,16 @@
 	name = "conjured bush seed"
 	desc = "A bush seed called forth by the Treefather's will. It will vanish if dropped."
 
-/obj/item/seeds/bush/conjured/Dropped(mob/user, forced = FALSE)
+/obj/item/seeds/bush/conjured/dropped(mob/user, silent = FALSE)
+	. = ..()
 	qdel(src)
 
 /obj/item/seeds/flower/conjured
 	name = "conjured flower seeds"
 	desc = "Flower seeds called forth by the Treefather's will. They will vanish if dropped. Use in-hand to choose which flower to cultivate."
 
-/obj/item/seeds/flower/conjured/Dropped(mob/user, forced = FALSE)
+/obj/item/seeds/flower/conjured/dropped(mob/user, silent = FALSE)
+	. = ..()
 	qdel(src)
 
 // -- Mushroom Fey Circle Spores ---------------------------
@@ -462,14 +464,14 @@
 // into a full fey teleport circle after 5 minutes of growing.
 // Obtained as a reward from Sanctified Tree category 3 ritual.
 
-/obj/item/seeds/mushroom_fae
+/obj/item/seeds/mushroom_fey
 	name = "fey mushroom spore"
 	desc = "A cluster of tiny pale spores that hum with strange, wild energy. They can only take root in blessed soil."
 	icon_state = "seed"
 	color = "#FFFFFF"
 	seed_identity = "mushroom fey spores"
 
-/obj/item/seeds/mushroom_fae/attack_turf(turf/T, mob/living/user)
+/obj/item/seeds/mushroom_fey/attack_turf(turf/T, mob/living/user)
 	var/obj/structure/soil/soil = locate(/obj/structure/soil) in T
 	if(!soil)
 		to_chat(user, span_warning("I need to plant these in a prepared soil plot."))
@@ -492,7 +494,7 @@
 	to_chat(user, span_notice("I plant the fey mushroom spores."))
 	qdel(src)
 
-/obj/item/seeds/mushroom_fae/try_plant_seed(mob/living/user, obj/structure/soil/soil)
+/obj/item/seeds/mushroom_fey/try_plant_seed(mob/living/user, obj/structure/soil/soil)
 	if(soil.blessed_time <= 0)
 		to_chat(user, span_warning("The soil must be blessed for these spores to take root."))
 		return

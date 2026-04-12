@@ -22,6 +22,8 @@
 	var/empty_refill_elapsed = 0
 	var/empty_refill_active = FALSE
 	var/active_sound = null
+	/// Set TRUE after the first sync with a real user, so charges are topped up correctly at spawn.
+	var/charges_initialized = FALSE
 
 /obj/effect/proc_holder/spell/targeted/blesscrop/update_icon()
 	if(!action)
@@ -78,7 +80,11 @@
 
 /obj/effect/proc_holder/spell/targeted/blesscrop/proc/sync_bless_charges(mob/user)
 	max_bless_charges = get_max_bless_charges(user)
-	if(!empty_refill_active)
+	if(!charges_initialized && user)
+		// First sync with a real user — set charges to the skill-based maximum immediately.
+		charges_initialized = TRUE
+		charge_counter = max_bless_charges
+	else if(!empty_refill_active)
 		charge_counter = clamp(charge_counter, 0, max_bless_charges)
 
 /obj/effect/proc_holder/spell/targeted/blesscrop/proc/start_empty_refill()
@@ -97,7 +103,8 @@
 	start_empty_refill()
 
 /obj/effect/proc_holder/spell/targeted/blesscrop/charge_check(mob/user, silent = FALSE)
-	sync_bless_charges(user)
+	if(!silent || charges_initialized)
+		sync_bless_charges(user)
 	if(empty_refill_active || charge_counter <= 0)
 		if(!empty_refill_active)
 			start_empty_refill()
@@ -173,6 +180,17 @@
 		blessed_seed_powder = user.get_inactive_held_item()
 	if(!istype(blessed_seed_powder))
 		blessed_seed_powder = null
+	// Also accept a Harvest Bloomstone as a one-charge powder substitute.
+	var/obj/item/alch/bloomstone/held_bloomstone = null
+	if(!blessed_seed_powder)
+		var/obj/item/act_item = user.get_active_held_item()
+		var/obj/item/inact_item = user.get_inactive_held_item()
+		if(istype(act_item, /obj/item/alch/bloomstone))
+			held_bloomstone = act_item
+		else if(istype(inact_item, /obj/item/alch/bloomstone))
+			held_bloomstone = inact_item
+	// seed_source is either a blessed seed powder or a bloomstone acting as one.
+	var/obj/item/seed_source = blessed_seed_powder || held_bloomstone
 	// Detect a held bucket or mortar containing holy water for log blessing.
 	var/obj/item/reagent_containers/water_container = null
 	for(var/obj/item/held in list(user.get_active_held_item(), user.get_inactive_held_item()))
@@ -190,8 +208,8 @@
 		if(!target_long_logs.len)
 			to_chat(user, span_warning("There are no large logs at that location to sanctify."))
 			return FALSE
-		if(!blessed_seed_powder)
-			to_chat(user, span_warning("I need blessed seed powder in-hand to sanctify logs."))
+		if(!seed_source)
+			to_chat(user, span_warning("I need blessed seed powder or a harvest bloomstone in-hand to sanctify logs."))
 			return FALSE
 		if(!water_container)
 			to_chat(user, span_warning("I need a stone mortar or bucket with blessed water in-hand to sanctify logs."))
@@ -211,7 +229,7 @@
 			to_chat(user, span_warning("There are no unblessed long logs here to sanctify."))
 			return FALSE
 		water_container.reagents.remove_reagent(/datum/reagent/water/blessed, blessed_amt)
-		qdel(blessed_seed_powder)
+		qdel(seed_source)
 		visible_message(span_green("[usr] sanctifies the long logs with Dendor's favor!"))
 		return TRUE
 
@@ -222,11 +240,11 @@
 	else
 		target_soil = locate(/obj/structure/soil) in target_turf
 	if(target_soil)
-		if(target_soil.blessed_time > 0 && !blessed_seed_powder)
+		if(target_soil.blessed_time > 0 && !seed_source)
 			to_chat(user, span_warning("That soil is already blessed. It can be blessed again in [DisplayTimeText(target_soil.blessed_time)]."))
 			revert_cast(user)
 			return FALSE
-		if(blessed_seed_powder)
+		if(seed_source)
 			var/amount_blessed = 0
 			for(var/obj/structure/soil/soil in range(4, user))
 				if(!soil.plant)
@@ -238,7 +256,7 @@
 			if(amount_blessed <= 0)
 				to_chat(user, span_warning("There are no nearby planted soil plots for the powder to bless."))
 				return FALSE
-			qdel(blessed_seed_powder)
+			qdel(seed_source)
 			spend_all_bless_charges()
 			visible_message(span_green("[usr] scatters blessed seed powder and Dendor's favor refreshes nearby crops!"))
 			return TRUE
@@ -254,9 +272,12 @@
 	else
 		target_tree = locate(/obj/structure/flora/roguetree) in target_turf
 	if(target_tree)
-		if(blessed_seed_powder && target_tree.reinvigorate_tree(user))
-			if(blessed_seed_powder == user.get_active_held_item() || blessed_seed_powder == user.get_inactive_held_item())
-				qdel(blessed_seed_powder)
+		if(seed_source && get_dist(user, target_tree) > 1)
+			to_chat(user, span_warning("I must be right next to the tree to convert it with Dendor's blessing."))
+			return FALSE
+		if(seed_source && target_tree.reinvigorate_tree(user))
+			if(seed_source == user.get_active_held_item() || seed_source == user.get_inactive_held_item())
+				qdel(seed_source)
 			visible_message(span_green("[usr] invokes Dendor's favor upon [target_tree]."))
 			return TRUE
 		if(target_tree.bless_tree(user))
@@ -530,7 +551,8 @@
 			span_notice("I feel the Treefather's power flow through me as [new_tree] is sanctified.")
 		)
 		SEND_SIGNAL(H, COMSIG_TREE_TRANSFORMED)
-		H.adjust_experience(/datum/skill/magic/druidic, 50, FALSE)
+		if(H.mind)
+			H.mind.add_sleep_experience(/datum/skill/magic/druidic, 50)
 		return TRUE
 
 	// ---- Wise tree → sanctified wise tree ----
@@ -549,7 +571,8 @@
 			span_notice("I feel the Treefather's power flow through me as the ancient tree is sanctified.")
 		)
 		SEND_SIGNAL(H, COMSIG_TREE_TRANSFORMED)
-		H.adjust_experience(/datum/skill/magic/druidic, 15, FALSE)
+		if(H.mind)
+			H.mind.add_sleep_experience(/datum/skill/magic/druidic, 50)
 		return TRUE
 
 	return FALSE
@@ -627,6 +650,8 @@
 	var/mob/living/simple_animal/hostile/retaliate/rogue/fae/dryad/lesser/D = new(spawn_turf, H)
 	conjured_dryad = D
 	D.summoner_spell = src
+	// Immediately follow the summoner on spawn.
+	D.follow_target = H
 	// Register cleanup if the dryad dies on its own
 	RegisterSignal(D, COMSIG_QDELETING, PROC_REF(on_dryad_deleted))
 	to_chat(H, span_green("A lesser dryad emerges from the roots, answering my call."))
@@ -647,7 +672,7 @@
 	action_icon_state = "blessing"
 	action_icon = 'icons/mob/actions/genericmiracles.dmi'
 	releasedrain = 50
-	recharge_time = 25 SECONDS
+	recharge_time = 1 MINUTES
 	chargetime = 0 SECONDS
 	max_targets = 1
 	cast_without_targets = FALSE
@@ -725,10 +750,12 @@
 		D.ai_controller.CancelActions()
 		D.ai_controller.clear_blackboard_key(BB_BASIC_MOB_CURRENT_TARGET)
 		D.ai_controller.clear_blackboard_key(BB_BASIC_MOB_RETALIATE_LIST)
-	// For old-style AI mobs, clear the enemies list and lose current target
-	// so the dryad can move to the target turf without being dragged back into combat.
+	// For old-style AI mobs, clear the enemies list, lose current target, and set
+	// non-aggressive so the dryad doesn't re-acquire an enemy mid-transit.
 	D.enemies = list()
+	D.target = null
 	D.LoseTarget()
+	D.aggressive = FALSE
 	D.Goto(target_turf, D.move_to_delay, 1)
 	addtimer(CALLBACK(src, PROC_REF(try_execute_surge), D, target_turf, H, 12), 0.5 SECONDS)
 	return TRUE
@@ -752,82 +779,97 @@
 /mob/living/carbon/human/try_handle_middle_targeted_spell(atom/target)
 	return FALSE
 
-/// Minion order subtype for controlling the lesser dryad faction.
-/// Middle-click yourself to command the dryad to follow; middle-click a mob or object to attack.
+/// Minion order subtype for controlling the lesser dryad companion.
+/// Uses the standard minion_order cast+click targeting (same as primordials):
+/// cast and click yourself to follow, a tile to guard there, or an enemy to attack.
+/// Overrides process_minions() to drive the dryad's old-style simple_animal AI vars
+/// (follow_target / guard_turf / enemies / target) instead of ai_controller blackboard keys.
 /obj/effect/proc_holder/spell/invoked/minion_order/lesser_dryad
 	name = "Order Dryad"
-	desc = "Command your lesser dryad. Middle-click yourself to make it follow you. Middle-click a mob or creature to make it chase and attack them."
+	desc = "Command your lesser dryad. Cast and click yourself to follow, a tile to guard there, or an enemy to attack."
 	faction_ordering = FALSE
 
-/obj/effect/proc_holder/spell/invoked/minion_order/lesser_dryad/cast(list/targets, mob/user)
-	to_chat(user, span_notice("Middle-click yourself to make my dryad follow, or middle-click a target to set it to attack."))
-
-/// Called from mob/living/carbon/human/MiddleClickOn to process Order Dryad commands.
-/mob/living/carbon/human/proc/try_handle_order_dryad(atom/A)
-	if(!mind)
-		return FALSE
-	var/obj/effect/proc_holder/spell/invoked/minion_order/lesser_dryad/S = null
-	for(var/obj/effect/proc_holder/spell/invoked/minion_order/lesser_dryad/spell in mind.spell_list)
-		S = spell
-		break
-	if(!S)
-		return FALSE
-
-	var/faction_tag = "[mind.current.real_name]_faction"
+/obj/effect/proc_holder/spell/invoked/minion_order/lesser_dryad/process_minions(order_type, turf/target_location, mob/living/target, faction_tag)
+	var/mob/living/carbon/human/caster = usr
+	if(!caster?.mind)
+		return
 	var/mob/living/simple_animal/hostile/retaliate/rogue/fae/dryad/lesser/D = null
-	for(var/mob/living/simple_animal/hostile/retaliate/rogue/fae/dryad/lesser/dryad in oview(14, src))
+	for(var/mob/living/simple_animal/hostile/retaliate/rogue/fae/dryad/lesser/dryad in oview(order_range, caster))
 		if(faction_tag in dryad.faction)
 			D = dryad
 			break
 	if(!D)
-		return FALSE
-
-	if(A == src)
-		// Follow command — make dryad neutral and follow owner
-		if(D.ai_controller)
-			D.ai_controller.CancelActions()
-			D.ai_controller.clear_blackboard_key(BB_BASIC_MOB_CURRENT_TARGET)
-			D.ai_controller.clear_blackboard_key(BB_TRAVEL_DESTINATION)
-			D.ai_controller.clear_blackboard_key(BB_BASIC_MOB_RETALIATE_LIST)
-			D.ai_controller.set_blackboard_key(BB_FOLLOW_TARGET, src)
-		// Old-style AI: clear enemies so the dryad stops combat and begins following
-		D.enemies = list()
-		D.LoseTarget()
-		D.follow_target = src
-		D.aggressive = FALSE
-		if(!("neutral" in D.faction))
-			D.faction += "neutral"
-		to_chat(src, span_notice("[D.name] will follow me."))
-		return TRUE
-
-	if(isliving(A) && A != src)
-		// Attack command — direct the dryad at the target
-		if(D.ai_controller)
-			D.ai_controller.CancelActions()
-			D.ai_controller.clear_blackboard_key(BB_FOLLOW_TARGET)
-			D.ai_controller.clear_blackboard_key(BB_TRAVEL_DESTINATION)
-			D.ai_controller.clear_blackboard_key(BB_BASIC_MOB_RETALIATE_LIST)
-			D.ai_controller.set_blackboard_key(BB_BASIC_MOB_CURRENT_TARGET, A)
-		// Old-style AI: set the enemy directly and start movement toward them.
-		// Do NOT call Retaliate() here — it scans nearby mobs and would add the
-		// wrong targets to the enemies list, causing the dryad to attack a
-		// different mob than the one that was middle-clicked.
-		D.follow_target = null
-		D.aggressive = TRUE
-		D.enemies = list(A)
-		D.LoseTarget()          // cancel current Goto so it re-paths toward A
-		D.Goto(get_turf(A), D.move_to_delay, 0)
-		if("neutral" in D.faction)
-			D.faction -= "neutral"
-		to_chat(src, span_notice("[D.name] charges at [A.name]!"))
-		return TRUE
-
-	return FALSE
-
-/mob/living/carbon/human/MiddleClickOn(atom/A, params)
-	if(try_handle_order_dryad(A))
+		to_chat(caster, span_warning("No dryad is nearby to command."))
 		return
-	return ..()
+	switch(order_type)
+		if("goto")
+			D.follow_target = null
+			D.enemies = list()
+			D.target = null
+			D.LoseTarget()
+			D.guard_turf = target_location
+			walk(D, 0)
+			D.aggressive = FALSE
+			if("neutral" in D.faction)
+				D.faction -= "neutral"
+			to_chat(caster, span_notice("[D.name] moves to guard that position."))
+		if("follow")
+			D.enemies = list()
+			D.target = null
+			D.LoseTarget()
+			D.lastattacker_weakref = null
+			D.ignore_owner_defense_until = world.time + 2 SECONDS
+			D.follow_target = caster
+			D.guard_turf = null
+			D.aggressive = FALSE
+			D.toggle_ai(AI_IDLE)
+			walk_towards(D, caster, D.move_to_delay)
+			if(!("neutral" in D.faction))
+				D.faction += "neutral"
+			to_chat(caster, span_notice("[D.name] will follow me."))
+		if("attack")
+			D.follow_target = null
+			D.guard_turf = null
+			walk(D, 0)
+			D.enemies = list(target)
+			D.target = target
+			D.aggressive = FALSE
+			if("neutral" in D.faction)
+				D.faction -= "neutral"
+			D.toggle_ai(AI_ON)
+			D.Goto(get_turf(target), D.move_to_delay, 0)
+			to_chat(caster, span_notice("[D.name] charges at [target.name]!"))
+		if("toggle_stance")
+			// Clicking the dryad itself — toggle between follow and stand-ground.
+			if("neutral" in D.faction)
+				D.follow_target = null
+				D.guard_turf = get_turf(D)
+				D.faction -= "neutral"
+				to_chat(caster, span_notice("[D.name] holds its ground."))
+			else
+				D.follow_target = caster
+				D.guard_turf = null
+				D.enemies = list()
+				D.target = null
+				D.LoseTarget()
+				D.lastattacker_weakref = null
+				D.ignore_owner_defense_until = world.time + 2 SECONDS
+				D.toggle_ai(AI_IDLE)
+				D.faction += "neutral"
+				walk_towards(D, caster, D.move_to_delay)
+				to_chat(caster, span_notice("[D.name] will follow me."))
+		if("aggressive")
+			// Clicking an ally — send dryad to their tile as a guard position.
+			D.follow_target = null
+			D.enemies = list()
+			D.target = null
+			D.LoseTarget()
+			D.guard_turf = get_turf(target)
+			walk(D, 0)
+			D.aggressive = FALSE
+			if("neutral" in D.faction)
+				D.faction -= "neutral"
+			to_chat(caster, span_notice("[D.name] moves toward [target.name]."))
 
 //==============================================================================
 // Conjure Floral Seed — granted by Cat 10 Floral Conjuration ritual.

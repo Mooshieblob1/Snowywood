@@ -33,7 +33,6 @@
 	STACON = 18
 	STASTR = 14
 	STASPD = 4
-	simple_detect_bonus = 20
 	deaggroprob = 0
 	defprob = 40
 	canparry = TRUE

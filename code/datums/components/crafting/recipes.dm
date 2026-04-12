@@ -37,6 +37,8 @@
 	//crafting diff, every diff removes 25% chance to craft
 	var/required_tech_node = null // String ID of required tech node, or null if no tech required
 	var/tech_unlocked = TRUE // Set to TRUE when the required tech is unlocked
+	/// Override the XP amount given on successful craft. -1 means use the default formula (STAINT*2 + craftdiff*10).
+	var/craft_xp_override = -1
 /*
 /datum/crafting_recipe/example
 	name = ""

@@ -7,7 +7,8 @@
 	dropshrink = 0.9
 	experimental_inhand = FALSE
 
-	grid_width = 32
+	grid_width = 64
+	grid_height = 32
 
 //==============================================================================
 // Druidic crafting recipes — appear under the "Druidic Trickery" tab in the
@@ -33,7 +34,7 @@
 	tools = list(/obj/item/pestle = 1)
 	craftdiff = SKILL_LEVEL_NOVICE
 	time = 2 SECONDS
-	grid_height = 64
+	craft_xp_override = 5
 
 /obj/item/reagent_containers/glass/mortar
 	name = "alchemical mortar"
@@ -114,7 +115,7 @@
 				QDEL_NULL(to_grind)
 				to_chat(user, span_notice("The seeds absorb Dendor's blessing, forming luminous powder."))
 				if(user.mind)
-					user.adjust_experience(/datum/skill/craft/alchemy, user.STAINT, FALSE)
+					user.mind.add_sleep_experience(/datum/skill/magic/druidic, 5)
 			return
 		var/datum/alch_grind_recipe/foundrecipe = find_recipe()
 		if(foundrecipe == null)

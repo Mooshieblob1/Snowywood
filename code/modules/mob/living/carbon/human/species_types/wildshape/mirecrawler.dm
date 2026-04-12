@@ -1,9 +1,11 @@
 /mob/living/carbon/human/species/wildshape/mirecrawler //The baseline and tracker of the wildshapes
-	name = "Moss Crawler"
+	name = "Mire Crawler"
 	race = /datum/species/mirecrawler
 	footstep_type = FOOTSTEP_MOB_CLAW
 	ambushable = FALSE
 	skin_armor = new /obj/item/clothing/suit/roguetown/armor/skin_armor/spider_skin
+	wildshape_icon = 'icons/roguetown/mob/monster/mirespider_small.dmi'
+	wildshape_icon_state = "crawler"
 
 /mob/living/carbon/human/species/wildshape/mirecrawler/death(gibbed, nocutscene = FALSE)
 	wildshape_untransform(TRUE, gibbed)
@@ -118,7 +120,7 @@
 /obj/item/rogueweapon/spider_fang/mire/left
 	icon_state = "claw_l"
 
-/obj/item/rogueweapon/spider_fang/mire/Initialize()
+/obj/item/rogueweapon/spider_fang/mire/Initialize(mapload)
 	. = ..()
 	ADD_TRAIT(src, TRAIT_NODROP, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOEMBED, TRAIT_GENERIC)
@@ -133,7 +135,6 @@
 	var/extendid = FALSE
 
 /obj/effect/proc_holder/spell/self/spiderfangs/mire/cast(mob/user = usr)
-	..()
 	var/obj/item/rogueweapon/spider_fang/mire/left/l
 	var/obj/item/rogueweapon/spider_fang/mire/right/r
 

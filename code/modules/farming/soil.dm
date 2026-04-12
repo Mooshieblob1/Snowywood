@@ -92,6 +92,11 @@ GLOBAL_LIST_EMPTY(soil_list)
 	record_round_statistic(STATS_PLANTS_HARVESTED)
 	to_chat(user, span_notice(feedback))
 	yield_produce(modifier, is_legendary)
+	// Dendor patrons earn 2 Druidic Trickery XP per successful harvest.
+	if(istype(user, /mob/living/carbon/human))
+		var/mob/living/carbon/human/H = user
+		if(H.patron?.type == /datum/patron/divine/dendor && H.mind)
+			H.mind.add_sleep_experience(/datum/skill/magic/druidic, 2)
 	update_icon()
 
 /obj/structure/soil/proc/try_handle_harvest(obj/item/attacking_item, mob/user, params)
@@ -441,9 +446,13 @@ GLOBAL_LIST_EMPTY(soil_list)
 /obj/structure/soil/examine(mob/user)
 	. = ..()
 	var/farming_skill = 0
+	var/can_read_growth_timers = FALSE
+	var/can_read_soil_stats = FALSE
 	if(isliving(user))
 		var/mob/living/living_user = user
 		farming_skill = living_user.get_skill_level(/datum/skill/labor/farming)
+		can_read_growth_timers = farming_skill >= SKILL_LEVEL_EXPERT || HAS_TRAIT(living_user, TRAIT_SEEDKNOW)
+		can_read_soil_stats = farming_skill >= SKILL_LEVEL_APPRENTICE || HAS_TRAIT(living_user, TRAIT_SEEDKNOW)
 	// Plant description
 	if(plant)
 		. += span_info("\The [plant.name] is growing here...")
@@ -459,17 +468,17 @@ GLOBAL_LIST_EMPTY(soil_list)
 		// Plant maturation and produce feedback
 		if(matured)
 			. += span_info("It's fully matured.")
-			if(farming_skill >= SKILL_LEVEL_EXPERT && !produce_ready)
+			if(can_read_growth_timers && !produce_ready)
 				var/time_until_produce = max(plant.produce_time - produce_time, 0)
 				. += span_info("Next harvest in approximately [DisplayTimeText(time_until_produce)] (at current growth rate).")
 		else
 			. += span_info("It has yet to mature.")
-			if(farming_skill >= SKILL_LEVEL_EXPERT)
+			if(can_read_growth_timers)
 				var/time_until_mature = max(plant.maturation_time - growth_time, 0)
 				. += span_info("Estimated time to maturity: [DisplayTimeText(time_until_mature)].")
 		if(produce_ready)
 			. += span_info("It's ready for harvest.")
-	if(farming_skill >= SKILL_LEVEL_APPRENTICE)
+	if(can_read_soil_stats)
 		. += span_info("Water: [round((water / MAX_PLANT_WATER) * 100)]%")
 		. += span_info("Nutrition: [round((nutrition / MAX_PLANT_NUTRITION) * 100)]%")
 	else
@@ -603,6 +612,11 @@ GLOBAL_LIST_EMPTY(soil_list)
 	if(has_world_trait(/datum/world_trait/dendor_drought))
 		growth_multiplier *= 0.4
 		nutriment_eat_mutliplier *= 2
+	// Living Light aura (sanctified tree): 10% growth bonus, stacks with blessed soil.
+	for(var/obj/structure/flora/roguetree/wise/sanctified/tree in range(5, src))
+		if(tree.tree_data?.has_heal_aura)
+			growth_multiplier *= 1.1
+			break
 	// If there's too many weeds, they hamper the growth of the plant
 	if(weeds >= MAX_PLANT_WEEDS * 0.3)
 		growth_multiplier *= 0.75

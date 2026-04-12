@@ -238,6 +238,10 @@
 
 /obj/structure/flora/ausbushes/lavendergrass
 	icon_state = "lavendergrass_1"
+	max_integrity = 100
+	blade_dulling = DULLING_CUT
+	destroy_sound = "plantcross"
+	debris = list(/obj/item/natural/fibers = 1)
 
 /obj/structure/flora/ausbushes/lavendergrass/Initialize(mapload)
 	icon_state = "lavendergrass_[rand(1, 4)]"
@@ -245,6 +249,10 @@
 
 /obj/structure/flora/ausbushes/ywflowers
 	icon_state = "ywflowers_1"
+	max_integrity = 100
+	blade_dulling = DULLING_CUT
+	destroy_sound = "plantcross"
+	debris = list(/obj/item/natural/fibers = 1)
 
 /obj/structure/flora/ausbushes/ywflowers/Initialize(mapload)
 	icon_state = "ywflowers_[rand(1, 3)]"
@@ -252,6 +260,10 @@
 
 /obj/structure/flora/ausbushes/brflowers
 	icon_state = "brflowers_1"
+	max_integrity = 100
+	blade_dulling = DULLING_CUT
+	destroy_sound = "plantcross"
+	debris = list(/obj/item/natural/fibers = 1)
 
 /obj/structure/flora/ausbushes/brflowers/Initialize(mapload)
 	icon_state = "brflowers_[rand(1, 3)]"
@@ -259,6 +271,10 @@
 
 /obj/structure/flora/ausbushes/ppflowers
 	icon_state = "ppflowers_1"
+	max_integrity = 100
+	blade_dulling = DULLING_CUT
+	destroy_sound = "plantcross"
+	debris = list(/obj/item/natural/fibers = 1)
 
 /obj/structure/flora/ausbushes/ppflowers/Initialize(mapload)
 	icon_state = "ppflowers_[rand(1, 3)]"

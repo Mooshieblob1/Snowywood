@@ -38,7 +38,24 @@
 	armor = list("blunt" = 90, "slash" = 70, "stab" = 130, "piercing" = 40, "fire" = 0, "acid" = 0)
 	prevent_crits = list(BCLASS_CUT, BCLASS_STAB, BCLASS_BLUNT, BCLASS_CHOP)
 	max_integrity = ARMOR_INT_CHEST_LIGHT_MASTER
+	body_parts_covered = CHEST|GROIN|ARMS|LEGS
 	color = "#73c47a"
+
+/obj/item/clothing/suit/roguetown/armor/leather/druid/blessed/Initialize(mapload)
+	. = ..()
+	set_light(1, 1, 2, l_color = "#58C86A")
+	add_filter("druid_blessed_glow", 2, list("type" = "outline", "color" = "#58C86A", "alpha" = 95, "size" = 1))
+
+/obj/item/clothing/suit/roguetown/armor/leather/druid/blessed/pickup(mob/user)
+	. = ..()
+	if(!istype(user, /mob/living/carbon/human))
+		return
+	var/mob/living/carbon/human/H = user
+	if(H.patron?.type == /datum/patron/divine/dendor)
+		return
+	H.electrocute_act(30, src)
+	H.mob_timers["kneestinger"] = world.time
+	to_chat(H, span_warning("[name] rejects my grasp — only the Treefather's faithful may bear such a gift!"))
 
 /obj/structure/flora/roguetree/wise/sanctified/proc/is_valid_vigil_follower(mob/living/carbon/human/H)
 	if(!H)
@@ -108,11 +125,14 @@
 /obj/structure/flora/roguetree/wise/sanctified
 	name = "sanctified tree"
 	desc = "A great tree consecrated by the Treefather. Its bark glows with faint light, and the air around it thrums with primal holiness. A nexus of druidic power."
+	examine_plays_music = FALSE
 	/// Base max_integrity before nearby-tree bonus.
 	max_integrity = 400
 	/// Disable wise-tree autonomous retaliation. The sanctified tree
 	/// cooperates with its druid warden rather than lashing out autonomously.
 	activated = FALSE
+	// Blessed log is spawned manually in obj_destruction — suppress the inherited plain log drop.
+	static_debris = list()
 
 	/// Datum holding ritual completion flags and the soulbind registry.
 	var/datum/sanctified_tree_data/tree_data
@@ -231,6 +251,15 @@
 	if(!tree_data)
 		return
 
+	if(tree_data.wedding_active)
+		// Nature's Union ceremony is active — offer cancellation.
+		var/choice = alert(user, "A Nature's Union wedding ceremony is active at this tree. The Treefather's blessing currently joins two souls.\n\nCancel the wedding ceremony?", "Sanctified Tree", "Keep Ceremony", "Cancel Ceremony")
+		if(choice == "Cancel Ceremony" && !QDELETED(src) && !QDELETED(user))
+			tree_data.wedding_active = FALSE
+			tree_data.wedding_officiant_ckey = null
+			to_chat(user, span_warning("The wedding ceremony is dissolved. The Treefather withdraws his blessing."))
+		return
+
 	if(tree_data.active_ritual)
 		// Show progress and only allow cancellation from the amulet menu.
 		show_ritual_requirements(user, tree_data.active_ritual)
@@ -241,9 +270,21 @@
 		return
 
 	// No active ritual — show the category picker.
+	// Display order and skill gates:
+	//   cat1 (Dendor's Harvest)    — None
+	//   cat8 (Nature's Union)      — Novice
+	//   cat10 (Floral Conjuration) — Novice
+	//   cat2 (Fungal Vigil)        — Apprentice
+	//   cat5 (Living Light)        — Apprentice
+	//   cat4 (Treefather's Bulwark)— Journeyman
+	//   cat7 (Soulbind)            — Journeyman
+	//   cat9 (Harvest Bloomstone)  — Expert
+	//   cat3 (Fey Weaving)         — Expert
+	//   cat6 (Nature's Temper)     — Master
+	//   cat11 (Winged Rebirth)   — Legendary
 	var/list/cat_opts = list()
 	var/list/cat_map = list()
-	for(var/cat in list("cat1", "cat2", "cat3", "cat4", "cat5", "cat6", "cat7", "cat8", "cat9", "cat10"))
+	for(var/cat in list("cat1", "cat8", "cat10", "cat2", "cat5", "cat4", "cat7", "cat9", "cat3", "cat6", "cat11"))
 		var/cat_name = get_ritual_display_name(cat)
 		if(is_once_per_tree(cat) && (cat in tree_data.rituals_completed))
 			cat_opts["[cat_name] (completed)"] = null
@@ -257,12 +298,41 @@
 	if(!selected)
 		to_chat(user, span_info("That ritual has already been completed on this tree and cannot be repeated."))
 		return
-	// Cat9 requires Expert Druidic Trickery skill to initiate.
-	if(selected == "cat9" && istype(user, /mob/living/carbon/human))
-		var/mob/living/carbon/human/H9 = user
-		if(H9.get_skill_level(/datum/skill/magic/druidic) < SKILL_LEVEL_EXPERT)
-			to_chat(user, span_warning("The Harvest Bloomstone ritual demands Expert Druidic Trickery — the Treefather will not reveal this secret to one unprepared."))
+	// Druidic Trickery skill gate for each ritual.
+	if(istype(user, /mob/living/carbon/human))
+		var/mob/living/carbon/human/Hg = user
+		var/druidic_level = Hg.get_skill_level(/datum/skill/magic/druidic)
+		var/required_level = 0
+		var/required_name = ""
+		switch(selected)
+			if("cat8", "cat10")
+				required_level = SKILL_LEVEL_NOVICE
+				required_name = "Novice"
+			if("cat2", "cat5")
+				required_level = SKILL_LEVEL_APPRENTICE
+				required_name = "Apprentice"
+			if("cat4", "cat7")
+				required_level = SKILL_LEVEL_JOURNEYMAN
+				required_name = "Journeyman"
+			if("cat9", "cat3")
+				required_level = SKILL_LEVEL_EXPERT
+				required_name = "Expert"
+			if("cat6")
+				required_level = SKILL_LEVEL_MASTER
+				required_name = "Master"
+			if("cat11")
+				required_level = SKILL_LEVEL_LEGENDARY
+				required_name = "Legendary"
+		if(required_level > 0 && druidic_level < required_level)
+			to_chat(user, span_warning("The Treefather will not reveal [get_ritual_display_name(selected)] to one unprepared — [required_name] Druidic Trickery is required."))
 			return
+	// Once-per-person gate for Floral Conjuration: prevent initiating if already have the spell.
+	if(selected == "cat10" && istype(user, /mob/living/carbon/human))
+		var/mob/living/carbon/human/Hcat10 = user
+		if(Hcat10.mind)
+			for(var/obj/effect/proc_holder/spell/self/conjure_floral_seed/S in Hcat10.mind.spell_list)
+				to_chat(user, span_warning("The Treefather's floral gift is already within me — I cannot receive this blessing twice."))
+				return
 	if(!confirm_start_ritual(user, selected))
 		return
 	tree_data.active_ritual = selected
@@ -296,10 +366,11 @@
 		if("cat8") return "Nature's Union"
 		if("cat9") return "Harvest Bloomstone"
 		if("cat10") return "Floral Conjuration"
+		if("cat11") return "Winged Rebirth"
 	return "Unknown Ritual"
 
 /obj/structure/flora/roguetree/wise/sanctified/proc/is_once_per_tree(category)
-	return (category in list("cat4", "cat5", "cat6", "cat7", "cat9", "cat10"))
+	return (category in list("cat4", "cat5", "cat6", "cat7", "cat9", "cat10", "cat11"))
 
 /// Returns associative list of offering key -> required count for the given category.
 /obj/structure/flora/roguetree/wise/sanctified/proc/get_required_offerings(category)
@@ -312,8 +383,26 @@
 		if("cat6") return list("zizobane" = 5, "runed_artifact" = 2, "druid_armor" = 1, "volf_head" = 1, "spider_head" = 1, "tree_seed" = 1, "blessed_seed_powder" = 1, "holy_water_container" = 1)
 		if("cat7") return list("leechtick" = 1, "bones" = 4)
 		if("cat8") return list("wedding_flower" = 1)
-		if("cat9") return list("boulder_only" = 1, "magic_stone_10" = 1, "blessed_powder" = 5)
-		if("cat10") return list("flower_seed_offering" = 3, "manabloom_or_manacrystal" = 5)
+		if("cat9") return list("boulder_only" = 1, "magic_stone_or_essence" = 1, "blessed_powder" = 5)
+		if("cat10") return list(
+			"herb_atropa"     = 1,
+			"herb_matricaria"  = 1,
+			"herb_symphitum"   = 1,
+			"herb_taraxacum"   = 1,
+			"herb_euphrasia"   = 1,
+			"herb_paris"       = 1,
+			"herb_calendula"   = 1,
+			"herb_mentha"      = 1,
+			"herb_urtica"      = 1,
+			"herb_salvia"      = 1,
+			"herb_hypericum"   = 1,
+			"herb_benedictus"  = 1,
+			"herb_valeriana"   = 1,
+			"herb_artemisia"   = 1,
+			"herb_rosa"        = 1,
+			"manabloom_single" = 1
+		)
+		if("cat11") return list("feather" = 10, "bonedust" = 10, "essence_of_wilderness" = 1, "bloomstone" = 1)
 	return list()
 
 /obj/structure/flora/roguetree/wise/sanctified/proc/get_offering_desc(key)
@@ -338,9 +427,28 @@
 		if("bones") return "Bones"
 		if("wedding_flower") return "Eoran peace flower"
 		if("boulder_only") return "A large boulder"
-		if("magic_stone_10") return "An strong mystical stone (magic power of 10)"
+		if("magic_stone_or_essence") return "An enchanted stone (magic power 10+), essence of wilderness, or essence of lumber"
 		if("blessed_powder") return "Blessed seed powder"
-		if("flower_seed_offering") return "Flower seeds packet"
+		if("herb_atropa")    return "Atropa herb"
+		if("herb_matricaria") return "Matricaria herb"
+		if("herb_symphitum") return "Symphitum herb"
+		if("herb_taraxacum") return "Taraxacum herb"
+		if("herb_euphrasia") return "Euphrasia herb"
+		if("herb_paris")     return "Paris herb"
+		if("herb_calendula") return "Calendula herb"
+		if("herb_mentha")    return "Mentha herb"
+		if("herb_urtica")    return "Urtica herb"
+		if("herb_salvia")    return "Salvia herb"
+		if("herb_hypericum") return "Hypericum herb"
+		if("herb_benedictus") return "Benedictus herb"
+		if("herb_valeriana") return "Valeriana herb"
+		if("herb_artemisia") return "Artemisia herb"
+		if("herb_rosa")      return "Rosa herb"
+		if("manabloom_single") return "A mana bloom flower"
+		if("feather") return "Feather"
+		if("bonedust") return "Bone meal"
+		if("essence_of_wilderness") return "Essence of wilderness"
+		if("bloomstone") return "Harvest bloomstone"
 	return key
 
 /obj/structure/flora/roguetree/wise/sanctified/proc/show_ritual_requirements(mob/living/user, category)
@@ -475,7 +583,9 @@
 			return istype(held, /obj/item/clothing/head/peaceflower)
 		if("boulder_only")
 			return istype(held, /obj/item/natural/rock)
-		if("magic_stone_10")
+		if("magic_stone_or_essence")
+			if(istype(held, /obj/item/natural/cured/essence) || istype(held, /obj/item/grown/log/tree/small/essence))
+				return TRUE
 			if(!istype(held, /obj/item/natural/stone))
 				return FALSE
 			var/obj/item/natural/stone/stone = held
@@ -483,9 +593,26 @@
 		if("blessed_powder")
 			// Exact type check — bloomstone is excluded intentionally.
 			return held.type == /obj/item/alch/blessedseedpowder
-		if("flower_seed_offering")
-			// Exact type — conjured flower seeds are excluded.
-			return held.type == /obj/item/seeds/flower
+		if("herb_atropa")    return held.type == /obj/item/alch/atropa
+		if("herb_matricaria") return held.type == /obj/item/alch/matricaria
+		if("herb_symphitum") return held.type == /obj/item/alch/symphitum
+		if("herb_taraxacum") return held.type == /obj/item/alch/taraxacum
+		if("herb_euphrasia") return held.type == /obj/item/alch/euphrasia
+		if("herb_paris")     return held.type == /obj/item/alch/paris
+		if("herb_calendula") return held.type == /obj/item/alch/calendula
+		if("herb_mentha")    return held.type == /obj/item/alch/mentha
+		if("herb_urtica")    return held.type == /obj/item/alch/urtica
+		if("herb_salvia")    return held.type == /obj/item/alch/salvia
+		if("herb_hypericum") return held.type == /obj/item/alch/hypericum
+		if("herb_benedictus") return held.type == /obj/item/alch/benedictus
+		if("herb_valeriana") return held.type == /obj/item/alch/valeriana
+		if("herb_artemisia") return held.type == /obj/item/alch/artemisia
+		if("herb_rosa")      return held.type == /obj/item/alch/rosa
+		if("manabloom_single") return istype(held, /obj/item/reagent_containers/food/snacks/grown/manabloom)
+		if("feather") return istype(held, /obj/item/natural/feather)
+		if("bonedust") return istype(held, /obj/item/alch/bonemeal)
+		if("essence_of_wilderness") return istype(held, /obj/item/natural/cured/essence)
+		if("bloomstone") return istype(held, /obj/item/alch/bloomstone)
 	return FALSE
 
 /obj/structure/flora/roguetree/wise/sanctified/proc/consume_offering(key, obj/item/held, mob/living/user)
@@ -507,8 +634,21 @@
 			qdel(held)
 		if("wedding_flower")
 			qdel(held)
-		if("boulder_only", "magic_stone_10", "blessed_powder", "flower_seed_offering")
+		if("boulder_only", "magic_stone_or_essence", "blessed_powder")
 			qdel(held)
+		if("herb_atropa", "herb_matricaria", "herb_symphitum", "herb_taraxacum", "herb_euphrasia",
+		   "herb_paris", "herb_calendula", "herb_mentha", "herb_urtica", "herb_salvia",
+		   "herb_hypericum", "herb_benedictus", "herb_valeriana", "herb_artemisia", "herb_rosa",
+		   "manabloom_single")
+			qdel(held)
+		if("feather", "bonedust", "essence_of_wilderness")
+			qdel(held)
+		if("bloomstone")
+			// Force the bloomstone to drain all charges so Destroy() actually deletes it.
+			held.forceMove(get_turf(src))
+			var/obj/item/alch/bloomstone/offered = held
+			offered.charges = 1
+			qdel(offered)
 
 /obj/structure/flora/roguetree/wise/sanctified/proc/check_ritual_complete()
 	if(!tree_data?.active_ritual)
@@ -528,8 +668,21 @@
 	playsound(get_turf(src), 'sound/ambience/noises/mystical (4).ogg', 70, TRUE)
 	visible_message(span_green("The [src.name] blazes with golden light as [user.name] completes a sacred ritual!"))
 	// Award Druidic Trickery XP for completing a bounty ritual.
-	var/ritual_xp = (cat == "cat1") ? 2 : 10
-	user.adjust_experience(/datum/skill/magic/druidic, ritual_xp, FALSE)
+	var/ritual_xp = 0
+	switch(cat)
+		if("cat1") ritual_xp = 5
+		if("cat2") ritual_xp = 25
+		if("cat3") ritual_xp = 50
+		if("cat4") ritual_xp = 100
+		if("cat5") ritual_xp = 100
+		if("cat6") ritual_xp = 200
+		if("cat7") ritual_xp = 100
+		if("cat8") ritual_xp = 25
+		if("cat9") ritual_xp = 50
+		if("cat10") ritual_xp = 100
+		if("cat11") ritual_xp = 0
+	if(ritual_xp > 0 && user.mind)
+		user.mind.add_sleep_experience(/datum/skill/magic/druidic, ritual_xp)
 	switch(cat)
 		if("cat1") reward_cat1(user)
 		if("cat2") reward_cat2(user)
@@ -541,6 +694,7 @@
 		if("cat8") reward_cat8(user)
 		if("cat9") reward_cat9(user)
 		if("cat10") reward_cat10(user)
+		if("cat11") reward_cat11(user)
 
 /obj/structure/flora/roguetree/wise/sanctified/proc/cancel_ritual(mob/living/user)
 	if(!tree_data?.active_ritual)
@@ -640,7 +794,7 @@
 /// Offerings: 5 runed artifacts OR leyline shards. Reward: 1 mushroom_fey seed.
 /obj/structure/flora/roguetree/wise/sanctified/proc/reward_cat3(mob/living/user)
 	var/turf/T = get_turf(user)
-	new /obj/item/seeds/mushroom_fae(T)
+	new /obj/item/seeds/mushroom_fey(T)
 	to_chat(user, span_green("A single handful of mushroom fey spores rises from the roots — the Treefather rewards patience."))
 
 /// Cat 4 — Treefather's Bulwark: slow aura + integrity boost (once per tree).
@@ -677,7 +831,7 @@
 	to_chat(user, span_green("[BA.name] rises from the ritual — the Treefather has blessed this armor with living power."))
 	// 50% chance: random wood armor piece from elven black oak mercenaries (excluding chest).
 	if(prob(50))
-		var/list/bonus_pool = list(/obj/item/clothing/head/roguetown/helmet/heavy/elven_helm, /obj/item/clothing/gloves/roguetown/elven_gloves, /obj/item/clothing/shoes/roguetown/boots/leather/elven_boots)
+		var/list/bonus_pool = list(/obj/item/clothing/head/roguetown/helmet/heavy/elven_helm/druidic, /obj/item/clothing/gloves/roguetown/elven_gloves/druidic, /obj/item/clothing/shoes/roguetown/boots/leather/elven_boots/druidic, /obj/item/clothing/cloak/forrestercloak/blessed)
 		var/bonus_type = pick(bonus_pool)
 		var/obj/item/bonus = new bonus_type(T)
 		to_chat(user, span_green("The roots also yield [bonus.name] — an additional gift."))
@@ -703,8 +857,8 @@
 	user.put_in_hands(B)
 	to_chat(user, span_green("The tree's roots cradle a glowing stone — and the Harvest Bloomstone rises to my hand, brimming in energy with the Treefather's blessing."))
 
-/// Cat 10 — Floral Conjuration: grants the Conjure Floral Seed spell (once per tree).
-/// Offerings: 3 flower seeds + 5 mana blooms or crystalized mana.
+/// Cat 10 — Floral Conjuration: grants the Conjure Floral Seed spell (once per tree, once per person).
+/// Offerings: one of every herb (atropa through rosa, 15 total).
 /obj/structure/flora/roguetree/wise/sanctified/proc/reward_cat10(mob/living/user)
 	if(!istype(user, /mob/living/carbon/human))
 		to_chat(user, span_warning("Only a humanoid may receive the Treefather's floral gift."))
@@ -712,8 +866,38 @@
 	var/mob/living/carbon/human/H = user
 	if(!H.mind)
 		return
+	// Once-per-person: don't grant the spell if they already have it.
+	for(var/obj/effect/proc_holder/spell/self/conjure_floral_seed/S in H.mind.spell_list)
+		to_chat(H, span_warning("I already know how to conjure floral seeds — this blessing cannot be received twice."))
+		return
 	H.mind.AddSpell(new /obj/effect/proc_holder/spell/self/conjure_floral_seed)
 	to_chat(H, span_green("The knowledge of Floral Conjuration flows into my mind — I can call seeds forth with the Treefather's power."))
+
+/// Cat 11 — Winged Rebirth: choose a winged form and add it to Beast Form choices (once per tree).
+/// Offerings: 10 feathers, 10 bonedust, 1 essence of wilderness, 1 harvest bloomstone.
+/obj/structure/flora/roguetree/wise/sanctified/proc/reward_cat11(mob/living/user)
+	if(!istype(user, /mob/living/carbon/human))
+		to_chat(user, span_warning("Only a humanoid may receive the Treefather's trickster blessing."))
+		return
+	var/mob/living/carbon/human/H = user
+	if(!H.mind)
+		return
+	var/obj/effect/proc_holder/spell/self/wildshape/ws = H.mind.get_spell(/obj/effect/proc_holder/spell/self/wildshape)
+	if(!ws)
+		to_chat(H, span_warning("I need the Beast Form miracle before I can bind a new shape."))
+		return
+
+	var/already_has_bat  = (/mob/living/carbon/human/species/wildshape/bat  in ws.possible_shapes)
+	var/already_has_crow = (/mob/living/carbon/human/species/wildshape/crow in ws.possible_shapes)
+	if(already_has_bat && already_has_crow)
+		to_chat(H, span_notice("These winged guises already reside within my soul."))
+		return
+
+	if(!already_has_bat)
+		ws.possible_shapes += /mob/living/carbon/human/species/wildshape/bat
+	if(!already_has_crow)
+		ws.possible_shapes += /mob/living/carbon/human/species/wildshape/crow
+	to_chat(H, span_green("The knowledge of bat and crow forms take root in my soul. I can now call shift into them through Beast Form."))
 
 //==============================================================================
 // Aura Procs
@@ -752,6 +936,7 @@
 			tree_data.slowed_mobs |= H
 
 /// Heals Dendor followers within 5 tiles periodically like a healing miracle.
+/// Also heals non-undead animals and lesser dryads in range.
 /// Called every 60 seconds when has_heal_aura is TRUE.
 /obj/structure/flora/roguetree/wise/sanctified/proc/pulse_heal_aura()
 	var/healed_any = FALSE
@@ -764,6 +949,17 @@
 			continue
 		H.apply_status_effect(/datum/status_effect/buff/healing, 2.5)
 		new /obj/effect/temp_visual/heal_rogue(get_turf(H))
+		healed_any = TRUE
+	// Also heal non-undead animals and lesser dryads within range.
+	for(var/mob/living/simple_animal/A in range(5, src))
+		if(A.mob_biotypes & MOB_UNDEAD)
+			continue
+		if(A.stat == DEAD)
+			continue
+		if(A.has_status_effect(/datum/status_effect/buff/healing))
+			continue
+		A.apply_status_effect(/datum/status_effect/buff/healing, 2.5)
+		new /obj/effect/temp_visual/heal_rogue(get_turf(A))
 		healed_any = TRUE
 	if(healed_any)
 		playsound(get_turf(src), 'sound/magic/churn.ogg', 30, FALSE)
@@ -886,7 +1082,7 @@
 
 	// Check intent
 	if(H.used_intent?.type != INTENT_HARM)
-		to_chat(H, span_warning("I must be on harm intent to complete the soulbind."))
+		to_chat(H, span_warning("I must punch the tree with my bloodied palm to complete the soulbind."))
 		return
 	// Check empty active hand
 	if(H.get_active_held_item())
@@ -968,7 +1164,7 @@
 
 	if(!(thegroom && thebride))
 		A.become_rotten()
-		to_chat(user, span_danger("The Treefather's blessing falters — the bitten souls are not present or have already been wed. The apple rots."))
+		to_chat(user, span_danger("The Treefather's blessing falters — the souls who have bitten the fruit are not present or have already been wed. The apple rots."))
 		tree_data.wedding_active = FALSE
 		tree_data.wedding_officiant_ckey = null
 		return
@@ -1014,7 +1210,6 @@
 
 /obj/structure/flora/roguetree/wise/sanctified/examine(mob/user)
 	. = ..()
-	SEND_SOUND(user, sound(null))
 	var/tree_count = 0
 	for(var/obj/structure/flora/newtree/T in range(5, src))
 		if(!T.burnt)
@@ -1034,6 +1229,7 @@
 		return
 	if(show_ritual_hints)
 		. += span_notice("Hold the Dendor amulet against this tree to start or cancel a Treefather bounty.")
+		. += span_notice("Alternatively, touch-intent with an empty hand while wearing the amulet opens the ritual menu.")
 		. += span_notice("To offer while a bounty is active, click the tree with the required item in-hand.")
 	if(show_ritual_hints && tree_data?.active_ritual)
 		. += span_notice("Active bounty: [get_ritual_display_name(tree_data.active_ritual)]")
@@ -1051,11 +1247,24 @@
 		. += span_info("A healing aura emanates from this tree. Middle-click the tree while adjacent to channel its healing energies.")
 
 /obj/structure/flora/roguetree/wise/sanctified/attack_hand(mob/user)
-	if(istype(user, /mob/living/carbon/human) && tree_data?.awaiting_soulbind_ckey)
+	if(istype(user, /mob/living/carbon/human))
 		var/mob/living/carbon/human/H = user
-		if(H.ckey == tree_data.awaiting_soulbind_ckey)
+		if(tree_data?.awaiting_soulbind_ckey && H.ckey == tree_data.awaiting_soulbind_ckey)
 			attempt_soulbind(H)
 			return
+		// Touch intent with empty hand while wearing the Dendor amulet opens the ritual menu.
+		// Check all slots the amulet can occupy: neck, wrists, ring, or gloves.
+		if(!H.get_active_held_item())
+			var/has_dendor_amulet = istype(H.get_item_by_slot(SLOT_NECK), /obj/item/clothing/neck/roguetown/psicross/dendor) || \
+									istype(H.get_item_by_slot(SLOT_WRISTS), /obj/item/clothing/neck/roguetown/psicross/dendor) || \
+									istype(H.get_item_by_slot(SLOT_RING), /obj/item/clothing/neck/roguetown/psicross/dendor) || \
+									istype(H.get_item_by_slot(SLOT_GLOVES), /obj/item/clothing/neck/roguetown/psicross/dendor)
+			if(has_dendor_amulet)
+				if(H.patron?.type != /datum/patron/divine/dendor)
+					to_chat(H, span_warning("Only a follower of Dendor may commune with this sacred tree."))
+					return
+				open_ritual_menu(H)
+				return
 	return ..()
 
 /obj/structure/flora/roguetree/wise/sanctified/attackby(obj/item/I, mob/living/user, params)
@@ -1090,6 +1299,8 @@
 /obj/structure/flora/roguetree/wise/sanctified/obj_destruction(damage_flag)
 	set_light(0)
 	visible_message(span_warning("The sanctified tree's golden light dies as it falls — the Treefather's blessing is broken!"))
+	var/obj/item/grown/log/tree/blessed_log = new(loc)
+	blessed_log.bless_log()
 	return ..()
 
 //==============================================================================
@@ -1101,6 +1312,7 @@
 /obj/structure/flora/roguetree/wise/sanctified/wise
 	name = "sanctified wise tree"
 	desc = "An ancient sacred tree directly blessed by a Dendorite acolyte. The Treefather's power flows through its roots — it radiates healing and repels those who would defile the grove — but its deeper mysteries are locked away."
+	examine_plays_music = TRUE
 	show_ritual_hints = FALSE
 
 /obj/structure/flora/roguetree/wise/sanctified/wise/Initialize(mapload)
@@ -1121,4 +1333,18 @@
 	if(istype(I, /obj/item/clothing/head/peaceflower))
 		to_chat(user, span_warning("Only a fully sanctified tree may officiate a wedding ceremony."))
 		return
+	return ..()
+
+/obj/structure/flora/roguetree/wise/sanctified/wise/attack_hand(mob/user)
+	// Block touch-intent ritual menu — this tree holds no further rites.
+	if(istype(user, /mob/living/carbon/human))
+		var/mob/living/carbon/human/H = user
+		if(!H.get_active_held_item())
+			var/has_dendor_amulet = istype(H.get_item_by_slot(SLOT_NECK), /obj/item/clothing/neck/roguetown/psicross/dendor) || \
+									istype(H.get_item_by_slot(SLOT_WRISTS), /obj/item/clothing/neck/roguetown/psicross/dendor) || \
+									istype(H.get_item_by_slot(SLOT_RING), /obj/item/clothing/neck/roguetown/psicross/dendor) || \
+									istype(H.get_item_by_slot(SLOT_GLOVES), /obj/item/clothing/neck/roguetown/psicross/dendor)
+			if(has_dendor_amulet)
+				to_chat(H, span_warning("This blessed tree holds no further rites — its power is already given."))
+				return
 	return ..()

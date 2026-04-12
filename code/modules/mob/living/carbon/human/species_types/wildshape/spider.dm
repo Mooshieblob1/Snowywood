@@ -157,6 +157,9 @@
 	ADD_TRAIT(src, TRAIT_NODROP, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOEMBED, TRAIT_GENERIC)
 
+/obj/item/rogueweapon/spider_fang/attack_self(mob/living/user)
+	qdel(src)
+
 // SPIDER SPELLS //
 /obj/effect/proc_holder/spell/self/spiderfangs
 	name = "Spider Fangs"
