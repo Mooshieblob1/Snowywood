@@ -12,15 +12,14 @@
 
 /obj/structure/flagpole/Initialize(mapload)
 	. = ..()
-	SSrogueinfo.all_flags += src
+	GLOB.rogue_info.all_flags += src
 
 /obj/structure/flagpole/Destroy()
-	SSrogueinfo.all_flags -= src
+	GLOB.rogue_info.all_flags -= src
 	return ..()
 
 /obj/structure/flagpole/proc/update_single_role(role_name, is_visible)
-	var/icon_state_name = "[role_name]"
-	var/image/I = image(icon, icon_state_name)
+	var/image/I = image(icon, role_name)
 
 	if(is_visible)
 		add_overlay(I)
@@ -30,8 +29,8 @@
 
 /obj/structure/flagpole/proc/update_desc()
 	var/list/active_names = list()
-	for(var/role in SSrogueinfo.role_visibility)
-		if(SSrogueinfo.role_visibility[role])
+	for(var/role in GLOB.rogue_info.role_visibility)
+		if(GLOB.rogue_info.role_visibility[role])
 			active_names += role
 
 	desc = active_names.len ? "Flags flying: [english_list(active_names)]." : "[initial(desc)]"
@@ -40,8 +39,8 @@
 	. = ..()
 
 	var/list/active_roles = list()
-	for(var/role in SSrogueinfo.role_visibility)
-		if(SSrogueinfo.role_visibility[role])
+	for(var/role in GLOB.rogue_info.role_visibility)
+		if(GLOB.rogue_info.role_visibility[role])
 			active_roles += role
 
 	if(!active_roles.len)
@@ -50,7 +49,7 @@
 	var/dropdown_html = "<details><summary><b>View Active Flag Details</b></summary>"
 
 	for(var/role in active_roles)
-		var/list/data = SSrogueinfo.role_data[role]
+		var/list/data = GLOB.rogue_info.role_data[role]
 		var/role_desc = data ? data["desc"] : "No description available."
 		var/role_note = data ? data["note"] : "No custom notes."
 
@@ -94,7 +93,7 @@
 	flag_overlay = mutable_appearance(icon, "flag")
 	flag_overlay.color = flag_color
 
-	var/active = SSrogueinfo.role_visibility[controlled_role]
+	var/active = GLOB.rogue_info.role_visibility[controlled_role]
 
 	if(active)
 		add_overlay(flag_overlay)
@@ -104,9 +103,10 @@
 /obj/item/mini_flagpole/attack_self(mob/user)
 	if(!can_use(user))
 		return
-	var/new_status = !SSrogueinfo.role_visibility[controlled_role]
 
-	if(SSrogueinfo.set_role_visibility(controlled_role, new_status))
+	var/new_status = !GLOB.rogue_info.role_visibility[controlled_role]
+
+	if(GLOB.rogue_info.set_role_visibility(controlled_role, new_status))
 		update_visuals()
 		to_chat(user, "You set the [controlled_role] flag to [new_status ? "raised" : "lowered"].")
 
@@ -115,9 +115,7 @@
 	if(!can_use(user))
 		return
 
-	if(!istype(user))
-		return
-	var/list/role_entry = SSrogueinfo.role_data[controlled_role]
+	var/list/role_entry = GLOB.rogue_info.role_data[controlled_role]
 	if(!role_entry)
 		to_chat(user, span_alert("Error: No data entry found for [controlled_role]."))
 		return

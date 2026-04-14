@@ -1,6 +1,6 @@
-SUBSYSTEM_DEF(rogueinfo)
-	name = "RogueInfo Controller"
-	flags = SS_NO_FIRE
+GLOBAL_DATUM_INIT(rogue_info, /datum/rogue_info, new)
+
+/datum/rogue_info
 
 	var/list/role_visibility = list(
 		"blacksmith" = FALSE,
@@ -80,10 +80,7 @@ SUBSYSTEM_DEF(rogueinfo)
 
 	var/list/all_flags = list()
 
-/datum/controller/subsystem/rogueinfo/Initialize()
-	. = ..()
-
-/datum/controller/subsystem/rogueinfo/proc/set_role_visibility(role_name, new_status)
+/datum/rogue_info/proc/set_role_visibility(role_name, new_status)
 	if(!(role_name in role_visibility))
 		return FALSE
 
