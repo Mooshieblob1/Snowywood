@@ -8,6 +8,8 @@
 // END_PREFERENCES
 // BEGIN_INCLUDE
 #include "_maps\_basemap.dm"
+#include "_maps\dun_world.dm"
+#include "_maps\rockhill.dm"
 #include "_maps\map_files\generic\CentCom.dmm"
 #include "_maps\templates\arcyne_fortress.dm"
 #include "_maps\templates\bog_shack_small.dm"
@@ -3131,10 +3133,10 @@
 #include "modular_deserttown\jobs\garrison\cataphract.dm"
 #include "modular_deserttown\jobs\garrison\janissarysergeant.dm"
 #include "modular_deserttown\jobs\garrison\slavemaster.dm"
+#include "modular_deserttown\jobs\garrison\janissary\flagbearer.dm"
 #include "modular_deserttown\jobs\garrison\janissary\footman.dm"
 #include "modular_deserttown\jobs\garrison\janissary\janissary.dm"
 #include "modular_deserttown\jobs\garrison\janissary\jezail.dm"
-#include "modular_deserttown\jobs\garrison\janissary\flagbearer.dm"
 #include "modular_deserttown\jobs\garrison\janissary\zephyr.dm"
 #include "modular_hearthstone\code\datums\accents.dm"
 #include "modular_hearthstone\code\game\objects\effects\track.dm"
