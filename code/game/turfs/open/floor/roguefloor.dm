@@ -243,7 +243,7 @@
 	canSmoothWith = list(/turf/open/floor/rogue/snow,)
 	neighborlay = "snowedge"
 	spread_chance = 0
-	temperature = 100
+	temperature = 110
 /turf/open/floor/rogue/snow/Initialize(mapload)
 	dir = pick(GLOB.cardinals)
 	. = ..()
@@ -302,7 +302,7 @@
 	canSmoothWith = list(/turf/open/floor/rogue/snowrough,)
 	neighborlay = "snowroughedge"
 	spread_chance = 0
-	temperature = 100
+	temperature = 110
 
 /turf/open/floor/rogue/snowrough/Initialize(mapload)
 	dir = pick(GLOB.cardinals)
@@ -326,7 +326,7 @@
 	canSmoothWith = list(/turf/open/floor/rogue/snow,
 						/turf/open/floor/rogue/snowrough,)
 	neighborlay = "snowpatchy_grassedge"
-	temperature = 100
+	temperature = 110
 
 /turf/open/floor/rogue/snowpatchy/cardinal_smooth(adjacencies)
 	roguesmooth(adjacencies)
@@ -474,7 +474,9 @@
 	landsound = 'sound/foley/jumpland/grassland.wav'
 	slowdown = 0
 	smooth = SMOOTH_TRUE
-	canSmoothWith = list(/turf/open/floor/rogue/grassred,
+	canSmoothWith = list(/turf/open/floor/rogue/dirt,
+						/turf/open/floor/rogue/dirt/road,
+						/turf/open/floor/rogue/grassred,
 						/turf/open/floor/rogue/grassyel,
 						/turf/open/floor/rogue/grasscold,
 						/turf/open/floor/rogue/grassgrey,
@@ -515,7 +517,8 @@
 						/turf/open/floor/rogue/grasspurple,
 						/turf/open/floor/rogue/snowpatchy,
 						/turf/open/floor/rogue/snow,
-						/turf/open/floor/rogue/snowrough,)
+						/turf/open/floor/rogue/snowrough,
+						/turf/open/floor/rogue/AzureSand)
 	neighborlay = "dirtedge"
 	muddy = FALSE
 	bloodiness = 20
@@ -535,6 +538,7 @@
 	slowdown = 2
 	smooth = SMOOTH_TRUE
 	canSmoothWith = list(/turf/open/floor/rogue/grass,
+						/turf/open/floor/rogue/dunes,
 						/turf/open/floor/rogue/grassred,
 						/turf/open/floor/rogue/grassyel,
 						/turf/open/floor/rogue/grasscold,
@@ -591,16 +595,16 @@
 	if(L.stat != CONSCIOUS)
 		return
 
-	// Check if the user is holding a shovel
 	var/obj/item/rogueweapon/shovel/S = L.get_active_held_item()
+	if(!istype(S))
+		S = L.get_inactive_held_item()
+	if(!istype(S))
+		for(var/obj/item/rogueweapon/shovel/shovel in L.held_items)
+			S = shovel
+			break
 	if(!istype(S))
 		return
 
-	// Check if in scoop intent
-	if(L.used_intent.type != /datum/intent/shovelscoop)
-		return
-
-	// Call the shovel's autodig proc
 	if(S.start_autodig(L, src))
 		return TRUE
 
@@ -736,11 +740,88 @@
 	landsound = 'sound/foley/jumpland/dirtland.wav'
 	baseturfs = /turf/open/floor/rogue/sand
 	slowdown = 0
+	var/sand_amt = 3
 
 /turf/open/floor/rogue/sand/Initialize(mapload)
 	. = ..()
 	if(prob(15))
 		icon_state = "sand[rand(1,4)]"
+
+/turf/open/floor/rogue/sand/attack_right(mob/user)
+	if(isliving(user))
+		var/mob/living/L = user
+		if(L.stat != CONSCIOUS)
+			return
+		if(sand_amt <= 0)
+			to_chat(L, span_warning("There's no loose sand left to scoop here."))
+			return
+		var/obj/item/I = new /obj/item/natural/dirtclod/sand(src)
+		if(L.put_in_active_hand(I))
+			L.visible_message(span_warning("[L] scoops up some sand."))
+			sand_amt--
+		else
+			qdel(I)
+	. = ..()
+
+/turf/open/floor/rogue/sand/MiddleClick(mob/user, params)
+	. = ..()
+	if(!isliving(user))
+		return
+
+	var/mob/living/L = user
+	if(L.stat != CONSCIOUS)
+		return
+
+	var/obj/item/rogueweapon/shovel/S = L.get_active_held_item()
+	if(!istype(S))
+		S = L.get_inactive_held_item()
+	if(!istype(S))
+		for(var/obj/item/rogueweapon/shovel/shovel in L.held_items)
+			S = shovel
+			break
+	if(!istype(S))
+		return
+
+	if(S.start_autodig(L, src))
+		return TRUE
+
+	return FALSE
+
+/turf/open/floor/rogue/AzureSand/attack_right(mob/user)
+	if(isliving(user))
+		var/mob/living/L = user
+		if(L.stat != CONSCIOUS)
+			return
+		var/obj/item/I = new /obj/item/natural/dirtclod/sand(src)
+		if(L.put_in_active_hand(I))
+			L.visible_message(span_warning("[L] scoops up some sand."))
+		else
+			qdel(I)
+	. = ..()
+
+/turf/open/floor/rogue/AzureSand/MiddleClick(mob/user, params)
+	. = ..()
+	if(!isliving(user))
+		return
+
+	var/mob/living/L = user
+	if(L.stat != CONSCIOUS)
+		return
+
+	var/obj/item/rogueweapon/shovel/S = L.get_active_held_item()
+	if(!istype(S))
+		S = L.get_inactive_held_item()
+	if(!istype(S))
+		for(var/obj/item/rogueweapon/shovel/shovel in L.held_items)
+			S = shovel
+			break
+	if(!istype(S))
+		return
+
+	if(S.start_autodig(L, src))
+		return TRUE
+
+	return FALSE
 
 /turf/open/floor/rogue/hay
 	name = "hay"
@@ -902,7 +983,10 @@
 						/turf/open/floor/rogue/grasscold,
 						/turf/open/floor/rogue/snowpatchy,
 						/turf/open/floor/rogue/snow,
-						/turf/open/floor/rogue/snowrough,)
+						/turf/open/floor/rogue/snowrough,
+						/turf/open/floor/rogue/cobblerock,
+						/turf/open/floor/rogue/cobble,
+						/turf/open/floor/rogue/cobble/mossy,)
 
 /turf/open/floor/rogue/blocks/Initialize(mapload)
 	. = ..()
@@ -996,6 +1080,9 @@
 						/turf/closed/wall/mineral/rogue/stone,
 						/turf/closed/wall/mineral/rogue/stone/moss,
 						/turf/open/floor/rogue/cobble,
+						/turf/open/floor/rogue/cobblerock,
+						/turf/open/floor/rogue/cobble/mossy,
+						/turf/open/floor/rogue/blocks,
 						/turf/open/floor/rogue/dirt,
 						/turf/open/floor/rogue/grass,
 						/turf/open/floor/rogue/grassred,
@@ -1134,6 +1221,9 @@
 						/turf/closed/wall/mineral/rogue/stone,
 						/turf/closed/wall/mineral/rogue/stone/moss,
 						/turf/open/floor/rogue/cobble,
+						/turf/open/floor/rogue/cobble/mossy,
+						/turf/open/floor/rogue/cobblerock,
+						/turf/open/floor/rogue/blocks,
 						/turf/open/floor/rogue/dirt,
 						/turf/open/floor/rogue/grass,
 						/turf/open/floor/rogue/grassred,
@@ -1243,14 +1333,20 @@
 	neighborlay = "cobbleedge"
 	smooth = SMOOTH_TRUE
 	canSmoothWith = list(/turf/open/floor/rogue/dirt,
+						/turf/open/floor/rogue/dirt/road,
 						/turf/open/floor/rogue/grass,
 						/turf/open/floor/rogue/grassred,
 						/turf/open/floor/rogue/grassyel,
 						/turf/open/floor/rogue/grasscold,
+						/turf/open/floor/rogue/grassgrey,
+						/turf/open/floor/rogue/grasspurple,
 						/turf/open/floor/rogue/snowpatchy,
 						/turf/open/floor/rogue/snow,
 						/turf/open/floor/rogue/snowrough,
-						/turf/open/floor/rogue/AzureSand)
+						/turf/open/floor/rogue/AzureSand,
+						/turf/open/floor/rogue/cobblerock,
+						/turf/open/floor/rogue/cobble/mossy,
+						/turf/open/floor/rogue/blocks,)
 
 /turf/open/floor/rogue/cobble/cardinal_smooth(adjacencies)
 	roguesmooth(adjacencies)
@@ -1271,13 +1367,19 @@
 	neighborlay = "mossystone_edges"
 	smooth = SMOOTH_TRUE
 	canSmoothWith = list(/turf/open/floor/rogue/dirt,
+						/turf/open/floor/rogue/dirt/road,
 						/turf/open/floor/rogue/grass,
 						/turf/open/floor/rogue/grassred,
 						/turf/open/floor/rogue/grassyel,
 						/turf/open/floor/rogue/grasscold,
+						/turf/open/floor/rogue/grassgrey,
+						/turf/open/floor/rogue/grasspurple,
 						/turf/open/floor/rogue/snowpatchy,
 						/turf/open/floor/rogue/snow,
-						/turf/open/floor/rogue/snowrough,)
+						/turf/open/floor/rogue/snowrough,
+						/turf/open/floor/rogue/cobble,
+						/turf/open/floor/rogue/cobble/mossy,
+						/turf/open/floor/rogue/blocks,)
 
 /turf/open/floor/rogue/cobble/mossy/cardinal_smooth(adjacencies)
 	roguesmooth(adjacencies)
@@ -1327,6 +1429,20 @@
 	smooth = SMOOTH_MORE
 	canSmoothWith = list(/turf/open/floor/rogue,
 						/turf/closed/mineral,
+						/turf/open/floor/rogue/cobble,
+						/turf/open/floor/rogue/cobble/mossy,
+						/turf/open/floor/rogue/blocks,
+						/turf/open/floor/rogue/dirt,
+						/turf/open/floor/rogue/dirt/road,
+						/turf/open/floor/rogue/grass,
+						/turf/open/floor/rogue/grassred,
+						/turf/open/floor/rogue/grassyel,
+						/turf/open/floor/rogue/grasscold,
+						/turf/open/floor/rogue/grassgrey,
+						/turf/open/floor/rogue/grasspurple,
+						/turf/open/floor/rogue/snowpatchy,
+						/turf/open/floor/rogue/snow,
+						/turf/open/floor/rogue/snowrough,
 						/turf/closed/wall/mineral)
 
 /turf/open/floor/rogue/cobblerock/cardinal_smooth(adjacencies)
@@ -1386,6 +1502,7 @@
 	icon_state = "fur"
 	density = FALSE
 	anchored = TRUE
+	plane = -7
 
 /obj/structure/giantfur/small // the irony
 	name = "fur pelt"
@@ -1411,10 +1528,16 @@
 						/turf/closed/wall/mineral/rogue/stone/moss,
 						/turf/open/floor/rogue/cobble,
 						/turf/open/floor/rogue/dirt,
+						/turf/open/floor/rogue/dirt/road,
 						/turf/open/floor/rogue/grass,
 						/turf/open/floor/rogue/grassred,
 						/turf/open/floor/rogue/grassyel,
 						/turf/open/floor/rogue/grasscold,
+						/turf/open/floor/rogue/cobble,
+						/turf/open/floor/rogue/cobble/mossy,
+						/turf/open/floor/rogue/blocks,
+						/turf/open/floor/rogue/grassgrey,
+						/turf/open/floor/rogue/grasspurple,
 						/turf/open/floor/rogue/snowpatchy,
 						/turf/open/floor/rogue/snow,
 						/turf/open/floor/rogue/snowrough,)
@@ -1552,11 +1675,15 @@
 						/turf/closed/wall/mineral/rogue/stone,
 						/turf/closed/wall/mineral/rogue/stone/moss,
 						/turf/open/floor/rogue/cobble,
+						/turf/open/floor/rogue/cobble/mossy,
+						/turf/open/floor/rogue/cobblerock,
 						/turf/open/floor/rogue/dirt,
 						/turf/open/floor/rogue/grass,
 						/turf/open/floor/rogue/grassred,
 						/turf/open/floor/rogue/grassyel,
 						/turf/open/floor/rogue/grasscold,
+						/turf/open/floor/rogue/grasspurple,
+						/turf/open/floor/rogue/grassgrey,
 						/turf/open/floor/rogue/snowpatchy,
 						/turf/open/floor/rogue/snow,
 						/turf/open/floor/rogue/snowrough,)

@@ -17,8 +17,6 @@
 	salvage_amount = 1
 	cold_protection = GROIN | LEG_RIGHT | LEG_LEFT
 	min_cold_protection_temperature = BODYTEMP_COLD_LEVEL_ONE_MAX
-	heat_protection = null
-	max_heat_protection_temperature = BODYTEMP_NORMAL_MAX
 
 /obj/item/clothing/under/roguetown/trou/leather
 	name = "leather trousers"
@@ -39,6 +37,10 @@
 	desc = "Form-fitting legwear. Almost too form-fitting."
 	icon_state = "shadowpants"
 	allowed_race = NON_DWARVEN_RACE_TYPES
+	cold_protection = null
+	min_cold_protection_temperature = BODYTEMP_NORMAL_MIN
+	heat_protection = GROIN | LEG_RIGHT | LEG_LEFT
+	max_heat_protection_temperature = BODYTEMP_HEAT_LEVEL_ONE_MAX
 
 /obj/item/clothing/under/roguetown/trou/beltpants
 	name = "belt-buckled trousers"
@@ -79,8 +81,6 @@
 	detail_color = CLOTHING_BLACK
 	cold_protection = null
 	min_cold_protection_temperature = BODYTEMP_NORMAL_MIN
-	heat_protection = null
-	max_heat_protection_temperature = BODYTEMP_NORMAL_MAX
 
 /obj/item/clothing/under/roguetown/trou/formal/shorts
 	name = "trouser shorts"
@@ -108,6 +108,7 @@
 	name = "baggy desert pants"
 	desc = "A handmade pair of baggy, thin leather pants. Keeps sand out of your boots, sun off your legs, and a creacher's fangs from piercing your ankles."
 	naledicolor = FALSE
+	color = CLOTHING_DARKDRAB
 	cold_protection = null
 	min_cold_protection_temperature = BODYTEMP_NORMAL_MIN
 	heat_protection = GROIN | LEG_RIGHT | LEG_LEFT

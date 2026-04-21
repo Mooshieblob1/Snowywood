@@ -69,7 +69,10 @@
 				if(D.holie && D.holie.stage < 4)
 					D.holie.attackby(src, user)
 				else
-					if(istype(T, /turf/open/floor/rogue/dirt/road))
+					if(istype(T, /turf/open/floor/rogue/dirt/road/desert))
+						qdel(heldclod)
+						T.ChangeTurf(/turf/open/floor/rogue/dirt/desert, flags = CHANGETURF_INHERIT_AIR)
+					else if(istype(T, /turf/open/floor/rogue/dirt/road))
 						qdel(heldclod)
 						T.ChangeTurf(/turf/open/floor/rogue/dirt, flags = CHANGETURF_INHERIT_AIR)
 					else
@@ -90,6 +93,15 @@
 					playsound(T,'sound/items/dig_shovel.ogg', 100, TRUE)
 					update_icon()
 			return
+		if(istype(T, /turf/open/floor/rogue/sand) || istype(T, /turf/open/floor/rogue/AzureSand) || istype(T, /turf/open/floor/rogue/dunes))
+			if(heldclod)
+				heldclod.forceMove(T)
+				heldclod = null
+				playsound(T,'sound/items/empty_shovel.ogg', 100, TRUE)
+				update_icon()
+				return
+			if(scoop_sand_clod(T))
+				return
 		if(heldclod)
 			if(istype(T, /turf/open/water))
 				qdel(heldclod)
@@ -100,17 +112,23 @@
 			playsound(T,'sound/items/empty_shovel.ogg', 100, TRUE)
 			update_icon()
 			return
-		if(istype(T, /turf/open/floor/rogue/grass) || istype(T, /turf/open/floor/rogue/grassred) || istype(T, /turf/open/floor/rogue/grassyel) || istype(T, /turf/open/floor/rogue/grasscold))
+		if(istype(T, /turf/open/floor/rogue/grass) || istype(T, /turf/open/floor/rogue/grassred) || istype(T, /turf/open/floor/rogue/grassyel) || istype(T, /turf/open/floor/rogue/grasscold) || istype(T, /turf/open/floor/rogue/grasspurple) || istype(T, /turf/open/floor/rogue/grassgrey))
 			to_chat(user, span_warning("There is grass in the way."))
 			return
-		if(istype(T, /turf/open/floor/rogue/snow))
+		if(istype(T, /turf/open/floor/rogue/snow) || istype(T, /turf/open/floor/rogue/snowrough) || istype(T, /turf/open/floor/rogue/snowpatchy))
 			T.ChangeTurf(/turf/open/floor/rogue/dirt, flags = CHANGETURF_INHERIT_AIR)
 			to_chat(user, span_warning("You scoop away the snow!"))
 		return
 	. = ..()
 
 /obj/item/rogueweapon/shovel/proc/start_autodig(mob/living/L, turf/T)
-	if(!isliving(L) || !istype(T, /turf/open/floor/rogue/dirt))
+	if(!isliving(L))
+		return FALSE
+
+	if(istype(T, /turf/open/floor/rogue/sand) || istype(T, /turf/open/floor/rogue/AzureSand))
+		return start_autodig_sand(L, T)
+
+	if(!istype(T, /turf/open/floor/rogue/dirt))
 		return FALSE
 
 	var/turf/open/floor/rogue/dirt/D = T
@@ -163,6 +181,58 @@
 			else
 				break
 		else
+			break
+
+	return TRUE
+
+/obj/item/rogueweapon/shovel/proc/can_autodig_sand(turf/T)
+	if(istype(T, /turf/open/floor/rogue/sand))
+		var/turf/open/floor/rogue/sand/S = T
+		return S.sand_amt > 0
+	if(istype(T, /turf/open/floor/rogue/AzureSand) || istype(T, /turf/open/floor/rogue/dunes))
+		return TRUE
+	return FALSE
+
+/obj/item/rogueweapon/shovel/proc/scoop_sand_clod(turf/T)
+	if(!can_autodig_sand(T))
+		return FALSE
+
+	if(istype(T, /turf/open/floor/rogue/sand))
+		var/turf/open/floor/rogue/sand/S = T
+		S.sand_amt = max(S.sand_amt - 1, 0)
+
+	heldclod = new /obj/item/natural/dirtclod/sand(src)
+	playsound(T, 'sound/items/dig_shovel.ogg', 100, TRUE)
+	update_icon()
+	return TRUE
+
+/obj/item/rogueweapon/shovel/proc/start_autodig_sand(mob/living/L, turf/T)
+	if(!can_autodig_sand(T) || heldclod)
+		return FALSE
+
+	L.visible_message(span_notice("[L] begins shoveling sand on [T]..."))
+	if(!scoop_sand_clod(T))
+		return FALSE
+
+	while(do_after(L, 1 SECONDS, target = T))
+		var/turf/current_turf = get_turf(T)
+		if(!can_autodig_sand(current_turf))
+			break
+		if(!(L.mobility_flags & MOBILITY_STAND))
+			to_chat(L, span_warning("You are knocked down and stop digging."))
+			break
+
+		L.changeNext_move(L.used_intent.clickcd)
+		if(max_blade_int)
+			remove_bintegrity(2)
+
+		if(heldclod)
+			heldclod.forceMove(current_turf)
+			heldclod = null
+			playsound(current_turf, 'sound/items/empty_shovel.ogg', 100, TRUE)
+			update_icon()
+
+		if(!scoop_sand_clod(current_turf))
 			break
 
 	return TRUE

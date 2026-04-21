@@ -176,8 +176,17 @@ GLOBAL_LIST_EMPTY(roundstart_races)
 	var/gender_swapping = FALSE
 	var/stress_examine = FALSE
 	var/stress_desc = null
+	var/examine_stress_event = /datum/stressevent/shunned_race
+	var/examine_stress_event_xenophobic = /datum/stressevent/shunned_race_xenophobic
+	var/examine_stress_always = FALSE
+	var/examine_stress_ignores_tolerant = FALSE
+	var/examine_relief_patron = null
+	var/examine_relief_event = null
 
 	var/punch_damage
+	/// WARNING - This is a very simple implementation. Not meant for carbons composed of limbs!
+	var/custom_rotation_icon = null
+	var/custom_base_icon = null
 
 //Used for expanded lore blurbs on species.
 	var/expanded_desc
@@ -1286,7 +1295,7 @@ GLOBAL_LIST_EMPTY(roundstart_races)
 		if(!target.lying_attack_check(user))
 			return 0
 
-		var/armor_block = target.run_armor_check(selzone, "blunt", armor_penetration = BLUNT_DEFAULT_PENFACTOR, blade_dulling = user.used_intent.blade_class, damage = damage)
+		var/armor_block = target.run_armor_check(selzone, "blunt", armor_penetration = BLUNT_DEFAULT_PENFACTOR, blade_dulling = user.used_intent.blade_class, damage = damage, intdamfactor = user.used_intent?.intent_intdamage_factor)
 
 		target.lastattacker = user.real_name
 		if(target.mind)
@@ -1781,6 +1790,8 @@ GLOBAL_LIST_EMPTY(roundstart_races)
 						span_danger("I block [I]!"))
 		return 0
 
+	SEND_SIGNAL(H, COMSIG_SPECIES_ATTACKED_BY)
+
 	var/hit_area
 
 	selzone = accuracy_check(user.zone_selected, user, H, I.associated_skill, user.used_intent, I)
@@ -2143,7 +2154,7 @@ GLOBAL_VAR_INIT(cold_breath_overlay, mutable_appearance(
 				protection = (0.25 * H.get_cold_protection(loc_temp))
 			else
 				// Heating is BAD (we are hotter then norm)
-				protection = (-0.125 * (1 - H.get_heat_protection(loc_temp)))	//a maximum of 9.9 minutes of time to move 100 points of temp (one level)
+				protection = (-0.1 * H.get_heat_protection(loc_temp))	//a maximum of 9.9 minutes of time to move 100 points of temp (one level)
 
 			var/step = 0.25 + (protection)
 			env_adjust = step
@@ -2155,7 +2166,7 @@ GLOBAL_VAR_INIT(cold_breath_overlay, mutable_appearance(
 				protection = (0.25 * H.get_heat_protection(loc_temp))
 			else
 				// Cooling is BAD (we are colder then norm)
-				protection = (-0.125 * (1 - H.get_cold_protection(loc_temp)))	//a maximum of 9.9 minutes of time to move 100 points of temp (one level)
+				protection = (-0.1 * H.get_cold_protection(loc_temp))	//a maximum of 9.9 minutes of time to move 100 points of temp (one level)
 
 			var/step = 0.25 + (protection)
 			env_adjust = -step
@@ -2211,7 +2222,7 @@ GLOBAL_VAR_INIT(cold_breath_overlay, mutable_appearance(
 				H.apply_status_effect(/datum/status_effect/debuff/overheat)
 				H.update_health_hud()
 			return
-		if(H.bodytemperature >= BODYTEMP_HEAT_LEVEL_ONE_MAX)
+		if(H.bodytemperature >= BODYTEMP_HEAT_LEVEL_ONE_MAX && !HAS_TRAIT (H, TRAIT_EXTREME_TEMPERATURE_IMMUNE))
 			addtimer(CALLBACK(H, TYPE_PROC_REF(/mob/living/carbon/human, heat_warn)),20 SECONDS,TIMER_UNIQUE | TIMER_STOPPABLE | TIMER_NO_HASH_WAIT)
 			if(!H.heatstroke_timer_id)
 				H.heatstroke_timer_id = addtimer(CALLBACK(H, TYPE_PROC_REF(/mob/living/carbon/human, apply_heatexhaust)),2 MINUTES ,TIMER_STOPPABLE)
@@ -2230,8 +2241,8 @@ GLOBAL_VAR_INIT(cold_breath_overlay, mutable_appearance(
 				H.apply_status_effect(/datum/status_effect/debuff/brittle)
 				H.update_health_hud()
 			return
-		if(H.bodytemperature < BODYTEMP_COLD_LEVEL_ONE_MAX)	//Level 2 cold - con punishment, frostbite, speed reduction
-			if(prob(15))
+		if(H.bodytemperature < BODYTEMP_COLD_LEVEL_ONE_MAX && !HAS_TRAIT(H, TRAIT_EXTREME_TEMPERATURE_IMMUNE))	//Level 2 cold - con punishment, frostbite, speed reduction
+			if(prob(15) && !(H.m_intent == MOVE_INTENT_SNEAK || H.alpha <= 120)) //if we're sneaking or invisible, no shivering
 				addtimer(CALLBACK(H, TYPE_PROC_REF(/mob/living/carbon/human, emote), "shiver"), (rand(2,6)SECONDS),TIMER_UNIQUE | TIMER_STOPPABLE)
 			addtimer(CALLBACK(H, TYPE_PROC_REF(/mob/living/carbon/human, cold_warn)),20 SECONDS,TIMER_UNIQUE)
 			if(!H.hypothermia_timer_id)
@@ -2241,7 +2252,7 @@ GLOBAL_VAR_INIT(cold_breath_overlay, mutable_appearance(
 			H.relieve_heatstroke_from_cold()	//if you somehow bypass level 1, straight to level 2, still fix heatstroke
 		else	//level 1 cold
 			H.remove_movespeed_modifier(MOVESPEED_ID_COLD)
-			if(prob(5))
+			if(prob(5) && !(H.m_intent == MOVE_INTENT_SNEAK || H.alpha <= 120)) //if we're sneaking or invisible, no shivering
 				addtimer(CALLBACK(H, TYPE_PROC_REF(/mob/living/carbon/human, emote), "shiver"), (rand(2,6)SECONDS),TIMER_UNIQUE | TIMER_STOPPABLE)
 			H.relieve_heatstroke_from_cold()	//if has heatstroke, body chill fixes it
 			addtimer(CALLBACK(H, TYPE_PROC_REF(/mob/living/carbon/human, cold_warn)),20 SECONDS,TIMER_UNIQUE)
@@ -2254,7 +2265,6 @@ GLOBAL_VAR_INIT(cold_breath_overlay, mutable_appearance(
 			H.heatstroke_timer_id = null
 		H.clear_alert("temp")
 		H.remove_movespeed_modifier(MOVESPEED_ID_COLD)
-	H.update_health_hud()
 // A general-purpose proc used to centralise checks to skip turf, movement, step, etc.
 // For if a mob is floating, flying, intangible, etc.
 /datum/species/proc/is_floor_hazard_immune(mob/living/carbon/human/owner)

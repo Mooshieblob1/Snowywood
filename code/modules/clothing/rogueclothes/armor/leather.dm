@@ -15,6 +15,8 @@
 	sellprice = 20
 	armor_class = ARMOR_CLASS_LIGHT
 	salvage_result = /obj/item/natural/hide/cured
+	cold_protection = CHEST
+	min_cold_protection_temperature = BODYTEMP_COLD_LEVEL_ONE_MAX
 
 /obj/item/clothing/suit/roguetown/armor/leather/vest/winterjacket
 	name = "winter jacket"
@@ -25,8 +27,6 @@
 	detail_color = CLOTHING_BLACK
 	cold_protection = CHEST | ARM_RIGHT | ARM_LEFT
 	min_cold_protection_temperature = 50
-	heat_protection = null
-	max_heat_protection_temperature = BODYTEMP_NORMAL_MAX
 
 /obj/item/clothing/suit/roguetown/armor/leather/vest/winterjacket/update_icon()
 	cut_overlays()
@@ -71,8 +71,6 @@
 	desc = "A thick leather jacket adorned with fur and cog decals. The height of Heartfelt fashion."
 	cold_protection = CHEST | ARM_RIGHT | ARM_LEFT
 	min_cold_protection_temperature = 50
-	heat_protection = null
-	max_heat_protection_temperature = BODYTEMP_NORMAL_MAX
 
 /obj/item/clothing/suit/roguetown/armor/leather/cuirass
 	name = "leather cuirass"
@@ -85,6 +83,8 @@
 	desc = "A light armor of wildbeast hide. Far more durable than leather."
 	icon_state = "hidearmor"
 	max_integrity = ARMOR_INT_CHEST_LIGHT_MEDIUM
+	cold_protection = CHEST
+	min_cold_protection_temperature = 50
 
 /obj/item/clothing/suit/roguetown/armor/leather/studded/warden
 	name = "forester's armor"
@@ -93,6 +93,8 @@
 	icon = 'icons/roguetown/clothing/special/warden.dmi'
 	mob_overlay_icon = 'icons/roguetown/clothing/special/onmob/warden.dmi'
 	icon_state = "forestleather"
+	cold_protection = CHEST | ARM_RIGHT | ARM_LEFT
+	min_cold_protection_temperature = BODYTEMP_COLD_LEVEL_ONE_MAX
 
 /obj/item/clothing/suit/roguetown/armor/leather/studded/warden/upgraded
 	name = "forester's brigandine"
@@ -135,8 +137,6 @@
 	sellprice = 20
 	cold_protection = CHEST
 	min_cold_protection_temperature = BODYTEMP_COLD_LEVEL_ONE_MAX
-	heat_protection = null
-	max_heat_protection_temperature = BODYTEMP_NORMAL_MAX
 
 /obj/item/clothing/suit/roguetown/armor/leather/heavy/coat
 	name = "hardened leather coat"
@@ -150,8 +150,6 @@
 	sellprice = 25
 	cold_protection = CHEST | ARM_RIGHT | ARM_LEFT
 	min_cold_protection_temperature = BODYTEMP_COLD_LEVEL_ONE_MAX
-	heat_protection = null
-	max_heat_protection_temperature = BODYTEMP_NORMAL_MAX
 
 /obj/item/clothing/suit/roguetown/armor/leather/heavy/coat/confessor
 	name = "confessional coat"
@@ -189,6 +187,7 @@
 	armor = ARMOR_LEATHER_GOOD
 	prevent_crits = list(BCLASS_CUT, BCLASS_STAB, BCLASS_BLUNT, BCLASS_CHOP, BCLASS_SMASH)
 	max_integrity = ARMOR_INT_CHEST_LIGHT_MASTER
+	cold_protection = CHEST | ARM_LEFT | ARM_RIGHT
 	sellprice = 25
 
 /obj/item/clothing/suit/roguetown/armor/leather/heavy/freifechter
@@ -200,9 +199,7 @@
 	detail_tag = "_detail"
 	color = "#5E4440"
 	detail_color = "#c08955"
-	cold_protection = null
-	min_cold_protection_temperature = BODYTEMP_NORMAL_MIN
-	heat_protection = CHEST | ARM_RIGHT | ARM_LEFT
+	heat_protection = CHEST
 	max_heat_protection_temperature = BODYTEMP_HEAT_LEVEL_ONE_MAX
 
 /obj/item/clothing/suit/roguetown/armor/leather/heavy/freifechter/update_icon()
@@ -228,9 +225,7 @@
 	max_integrity = ARMOR_INT_CHEST_LIGHT_MASTER
 	sellprice = 100
 	cold_protection = CHEST | ARM_RIGHT | ARM_LEFT
-	min_cold_protection_temperature = BODYTEMP_COLD_LEVEL_ONE_MAX
-	heat_protection = null
-	max_heat_protection_temperature = BODYTEMP_NORMAL_MAX
+	min_cold_protection_temperature = 50
 
 /obj/item/clothing/suit/roguetown/armor/leather/bikini
 	name = "leather corslet"
@@ -265,7 +260,7 @@
 	icon_state = "vest"
 	item_state = "vest"
 	color = "#514339"
-	armor = ARMOR_CLOTHING
+	armor = ARMOR_LEATHER_BAD
 	prevent_crits = list(BCLASS_CUT)
 	blocksound = SOFTHIT
 	slot_flags = ITEM_SLOT_ARMOR|ITEM_SLOT_SHIRT
@@ -298,8 +293,6 @@
 	sleeved = 'icons/roguetown/clothing/onmob/armor.dmi'
 	allowed_sex = list(MALE, FEMALE)
 	allowed_race = NON_DWARVEN_RACE_TYPES
-	cold_protection = null
-	min_cold_protection_temperature = BODYTEMP_NORMAL_MIN
 	heat_protection = CHEST | ARM_RIGHT | ARM_LEFT
 	max_heat_protection_temperature = BODYTEMP_HEAT_LEVEL_ONE_MAX
 
@@ -343,3 +336,81 @@
 		if(get_detail_color())
 			pic.color = get_detail_color()
 		add_overlay(pic)
+
+/obj/item/clothing/suit/roguetown/armor/leather/newkeep/
+	icon = 'icons/roguetown/clothing/licensed-infraredbaron/armor.dmi'
+	mob_overlay_icon = 'icons/roguetown/clothing/licensed-infraredbaron/onmob/armor.dmi'
+	sleevetype = null
+	sleeved = null
+	slot_flags = ITEM_SLOT_SHIRT|ITEM_SLOT_ARMOR
+	sellprice = 50
+
+/obj/item/clothing/suit/roguetown/armor/leather/newkeep/duchess
+	name = "duchess dress"
+	desc = ""
+	icon_state = "duchess"
+	item_state = "duchess"
+	slot_flags = ITEM_SLOT_CLOAK|ITEM_SLOT_ARMOR
+	body_parts_covered = CHEST|GROIN|LEGS|ARMS|VITALS
+
+/obj/item/clothing/suit/roguetown/armor/leather/newkeep/duke
+	name = "ducal uniform"
+	desc = ""
+	icon_state = "duke"
+	item_state = "duke"
+	body_parts_covered = CHEST|VITALS|ARMS
+
+/obj/item/clothing/suit/roguetown/armor/leather/newkeep/hand
+	name = "Hand's Jacket"
+	desc = "A heavy coat of fine, yet rugged fabric. Reinforced, because one never knows."
+	icon_state = "hand"
+	item_state = "hand"
+	armor = ARMOR_LEATHER_STUDDED
+	body_parts_covered = COVERAGE_ALL_BUT_LEGS
+
+/obj/item/clothing/suit/roguetown/armor/leather/newkeep/heir
+	name = "Heir's uniform"
+	desc = ""
+	icon_state = "heir"
+	item_state = "heir"
+	body_parts_covered = BELOW_HEAD
+
+/obj/item/clothing/suit/roguetown/armor/leather/newkeep/heiress
+	name = "Heiress's uniform"
+	desc = ""
+	icon_state = "heiress"
+	item_state = "heiress"
+	body_parts_covered = BELOW_HEAD
+
+/obj/item/clothing/suit/roguetown/armor/leather/newkeep/councillor
+	name = "councillorial uniform"
+	desc = ""
+	icon_state = "councillor"
+	item_state = "councillor"
+	body_parts_covered = COVERAGE_ALL_BUT_LEGS
+
+/obj/item/clothing/suit/roguetown/armor/leather/newkeep/magos
+	name = "Magos' Robes"
+	desc = ""
+	icon_state = "magos"
+	item_state = "magos"
+	slot_flags = ITEM_SLOT_ARMOR
+	body_parts_covered = COVERAGE_ALL_BUT_LEGS
+
+/obj/item/clothing/suit/roguetown/armor/leather/newkeep/steward
+	name = "Steward's Vest"
+	desc = "Smart and modern garb, embroidered with real gold"
+	icon_state = "steward"
+	item_state = "steward"
+	body_parts_covered = COVERAGE_ALL_BUT_LEGS
+	armor = ARMOR_PADDED_BAD
+	
+/obj/item/clothing/head/roguetown/duchess_hood
+	name = "duchess hood"
+	icon = 'icons/roguetown/clothing/licensed-infraredbaron/head.dmi'
+	mob_overlay_icon = 'icons/roguetown/clothing/licensed-infraredbaron/onmob/head.dmi'
+	icon_state = "duchess_hood"
+	item_state = "duchess_hood"
+	slot_flags = ITEM_SLOT_HEAD|ITEM_SLOT_MASK
+	flags_inv = HIDEEARS|HIDEFACE|HIDEHAIR|HIDEFACIALHAIR
+	armor = ARMOR_PADDED_BAD
