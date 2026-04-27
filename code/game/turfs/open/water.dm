@@ -672,11 +672,11 @@
 
 /turf/open/water/bath/fakepond
 	name = "fake pond"
-	desc = "Soothing water, with soapy bubbles on the surface. Dyed green to mimic gently floating duckwater."
+	desc = "Soothing water, with soapy bubbles on the surface. Dyed to perfection."
 	icon = 'icons/turf/roguefloor.dmi'
 	icon_state = "pond"
 	water_level = 2
-	water_color = "#367e94"
+	water_color = "#26aa98"
 	slowdown = 3
 	swim_skill = TRUE
 	wash_in = TRUE

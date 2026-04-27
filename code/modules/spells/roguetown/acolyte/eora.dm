@@ -20,11 +20,26 @@
 /obj/item/clothing/head/peaceflower/equipped(mob/living/carbon/human/user, slot)
 	. = ..()
 	if(slot == SLOT_HEAD)
-		ADD_TRAIT(user, TRAIT_PACIFISM, "peaceflower_[REF(src)]")
+		var/trait_given = user?.patron?.type == /datum/patron/divine/eora ? TRAIT_EORAN_CONTENTED : TRAIT_PACIFISM
+		ADD_TRAIT(user, trait_given, "peaceflower_[REF(src)]")
+		user.apply_status_effect(/datum/status_effect/buff/peaceflower)
 
 /obj/item/clothing/head/peaceflower/dropped(mob/living/carbon/human/user)
-	..()
-	REMOVE_TRAIT(user, TRAIT_PACIFISM, "peaceflower_[REF(src)]")
+	var/trait_given = user?.patron?.type == /datum/patron/divine/eora ? TRAIT_EORAN_CONTENTED : TRAIT_PACIFISM
+	REMOVE_TRAIT(user, trait_given, "peaceflower_[REF(src)]")
+	if(istype(user) && user?.head == src)
+		user.remove_status_effect(/datum/status_effect/buff/peaceflower)
+	return ..()
+
+/datum/status_effect/buff/peaceflower
+	id = "peaceflower"
+	alert_type = /atom/movable/screen/alert/status_effect/buff/peaceflower
+	effectedstats = list(STATKEY_STR = 1, STATKEY_PER = 1) // These are the stats that the eoran tree affect
+
+/atom/movable/screen/alert/status_effect/buff/peaceflower
+	name = "Eoran Bud"
+	desc = "Eora's beauty fills me with a sharpened clarity."
+	icon_state = "buff"
 
 /obj/item/clothing/head/peaceflower/attack_hand(mob/user)
 	if(iscarbon(user))

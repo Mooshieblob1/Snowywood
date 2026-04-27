@@ -3,6 +3,8 @@
 	domain = "Love, Family, Beauty"
 	desc = "The Lady of the Hearth blesses our Love, unconditional of for whom it is for. Marriage is Astrata's Tyranny encroaching on Eora's domain. Her followers are oft promiscuous, bards especially so."
 	worshippers = "Lovers, Doting Parents, Bards, Hopeless Romantics"
+	virtues = "Compassion, Beauty, Art"
+	sins = "Dispassion, Overindulgence, Sadism"
 	mob_traits = list(TRAIT_EMPATH, TRAIT_EXTEROCEPTION)
 	miracles = list(/obj/effect/proc_holder/spell/targeted/touch/orison			= CLERIC_ORI,
 					/obj/effect/proc_holder/spell/invoked/eora_blessing			= CLERIC_T0,
@@ -41,7 +43,7 @@
 		qdel(held_item)
 		return TRUE
 	// Allows player to pray while wearing eoran bud.
-	if(HAS_TRAIT(follower, TRAIT_PACIFISM))
+	if(HAS_TRAIT(follower, TRAIT_EORAN_CONTENTED))
 		return TRUE
 	to_chat(follower, span_danger("For Eora to hear my prayer I must either pray within the church, near a psycross, offering her poppy flowers, or wearing one of her blessed flowers atop my head.."))
 	return FALSE
@@ -62,7 +64,7 @@
 	if(HAS_TRAIT(target, TRAIT_PACIFISM))
 		bonus += 2.5
 
-	if(HAS_TRAIT(user, TRAIT_PACIFISM))
+	if(HAS_TRAIT(user, TRAIT_EORAN_CONTENTED))
 		bonus += 1.5
 
 	if(!bonus)
