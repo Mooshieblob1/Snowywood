@@ -49,6 +49,10 @@
 	///Whether an ambience sound has been played and one shouldn't be played again, unset by a callback
 	var/list/played = list()
 	var/list/nextspooky = 0
+	/// Whether combat music preview is currently playing from a picker dialog.
+	var/combat_music_preview_active = FALSE
+	/// Track key currently being previewed.
+	var/combat_music_preview_track_key = null
 
 	var/patreonlevel = -1
 	var/is_donator = FALSE
@@ -140,6 +144,7 @@
 	var/list/open_popups = list()
 
 	var/loop_sound = FALSE
+	var/loop_sound_file
 	var/rain_sound = FALSE
 	var/last_droning_sound
 	var/sound/droning_sound

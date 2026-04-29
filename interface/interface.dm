@@ -3,6 +3,7 @@
 	set name = "wiki"
 	set desc = ""
 	set category = "OOC"
+	set hidden = 1
 	var/wikiurl = CONFIG_GET(string/wikiurl)
 	if(wikiurl)
 		if(query)
@@ -68,35 +69,17 @@
 		to_chat(src, span_danger("You can't currently use Mentorhelp in the main menu."))
 
 /client/verb/reportissue()
-	set name = "report-issue"
+	set name = "Report Issue"
 	set desc = ""
-	set category = "OOC"
-	var/githuburl = CONFIG_GET(string/githuburl)
-	if(githuburl)
-		var/message = "This will open the Github issue reporter in your browser. Are you sure?"
-		if(GLOB.revdata.testmerge.len)
-			message += "<br>The following experimental changes are active and are probably the cause of any new or sudden issues you may experience. If possible, please try to find a specific thread for your issue instead of posting to the general issue tracker:<br>"
-			message += GLOB.revdata.GetTestMergeInfo(FALSE)
-		if(tgalert(src, message, "Report Issue","Yes","No")!="Yes")
-			return
-		var/static/issue_template = file2text(".github/ISSUE_TEMPLATE.md")
-		var/servername = CONFIG_GET(string/servername)
-		var/url_params = "Reporting client version: [byond_version].[byond_build]\n\n[issue_template]"
-		if(GLOB.round_id || servername)
-			url_params = "Issue reported from [GLOB.round_id ? " Round ID: [GLOB.round_id][servername ? " ([servername])" : ""]" : servername]\n\n[url_params]"
-		DIRECT_OUTPUT(src, link("[githuburl]/issues/new?body=[url_encode(url_params)]"))
-	else
-		to_chat(src, span_danger("The Github URL is not set in the server configuration."))
+	set category = "-Admin-"
+	var/message = "This will open the Github issue tracker in your browser. Are you sure?"
+	if(GLOB.revdata.testmerge.len)
+		message += "<br>The following experimental changes are active and are probably the cause of any new or sudden issues you may experience. If possible, please try to find a specific thread for your issue instead of posting to the general issue tracker:<br>"
+		message += GLOB.revdata.GetTestMergeInfo(FALSE)
+	if(tgalert(src, message, "Report Issue","Yes","No")!="Yes")
+		return
+	DIRECT_OUTPUT(src, link("https://github.com/Rotwood-Vale/Ratwood-2.0/issues"))
 	return
-
-/client/verb/recent_changelog()
-	set name = "Recent Changes"
-	set category = "OOC"
-	if(GLOB.changelog.len)
-		to_chat(src, "Recent Changes:")
-		for(var/change in GLOB.changelog)
-			to_chat(src, span_info("- [change]"))
-
 /client/verb/hotkeys_help()
 	set name = "_Help-Controls"
 	set category = "OOC"
@@ -256,6 +239,7 @@ Hotkey-Mode: (hotkey-mode must be on)
 /client/verb/set_picinchat()
 	set name = "Headshot in Chat"
 	set category = "Options"
+	set hidden = 1
 
 	if(prefs)
 		prefs.chatheadshot = !prefs.chatheadshot

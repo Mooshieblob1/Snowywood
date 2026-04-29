@@ -1,10 +1,11 @@
-import { useBackend } from '../backend';
-import { Window } from '../layouts';
+import { useBackend } from 'tgui/backend';
+import { Window } from 'tgui/layouts';
 import { NumberInput, Section, Stack } from 'tgui-core/components';
 
 type Data = {
   master: number;
   music: number;
+  combat: number;
   ambience: number;
   lobby: number;
 };
@@ -49,37 +50,50 @@ const VolumeRow = ({ label, value, id, description }: VolumeRowProps) => {
 export const VolumePowerMenu = () => {
   const { data } = useBackend<Data>();
   const {
-    master = 50,
-    music = 50,
-    ambience = 50,
-    lobby = 50,
+    master,
+    music,
+    combat,
+    ambience,
+    lobby,
   } = data;
 
+  const masterValue = master ?? 100;
+  const musicValue = music ?? 100;
+  const combatValue = combat ?? 50;
+  const ambienceValue = ambience ?? 100;
+  const lobbyValue = lobby ?? 100;
+
   return (
-    <Window width={470} height={340}>
+    <Window width={470} height={390}>
       <Window.Content>
         <Section title="Volume Levels" fill>
           <VolumeRow
             label="Master"
-            value={master}
+            value={masterValue}
             id="master"
             description="Non-music and non-ambience sounds."
           />
           <VolumeRow
             label="Music"
-            value={music}
+            value={musicValue}
             id="music"
-            description="In-round music channels and admin music."
+            description="Non-combat music and admin music."
+          />
+          <VolumeRow
+            label="Combat Music"
+            value={combatValue}
+            id="combat"
+            description="Combat and combat-adjacent music channels."
           />
           <VolumeRow
             label="Ambience"
-            value={ambience}
+            value={ambienceValue}
             id="ambience"
             description="Ambient and environmental loop channels."
           />
           <VolumeRow
             label="Lobby Music"
-            value={lobby}
+            value={lobbyValue}
             id="lobby"
             description="Title/lobby music playback volume."
           />

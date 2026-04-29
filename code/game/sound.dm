@@ -241,6 +241,7 @@
 			M.playsound_local(M, null, volume, vary, frequency, falloff, channel, pressure_affected, S)
 
 /mob/proc/stop_sound_channel(chan)
+	SHOULD_NOT_SLEEP(TRUE)
 	SEND_SOUND(src, sound(null, repeat = 0, wait = 0, channel = chan))
 
 /mob/proc/set_sound_channel_volume(channel, volume)
@@ -313,6 +314,8 @@
 		mute_sound_channel(chan)
 
 /mob/proc/update_channel_volume(chan, vol)
+	if(!client)
+		return
 	if(vol)
 		for(var/sound/S in client.SoundQuery())
 			if(S.channel == chan)
@@ -321,6 +324,8 @@
 				S.status |= SOUND_UPDATE
 				SEND_SOUND(src, S)
 				S.status &= ~SOUND_UPDATE
+	else
+		mute_sound_channel(chan)
 
 /client/proc/playtitlemusic()
 	set waitfor = FALSE

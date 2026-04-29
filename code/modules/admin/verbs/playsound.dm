@@ -62,12 +62,8 @@
 		prefs.musicvol = vol
 		prefs.save_preferences()
 
+		mob.update_music_volume(CHANNEL_MUSIC, prefs.musicvol)
 		mob.update_music_volume(CHANNEL_ADMIN, prefs.musicvol)
-		mob.update_music_volume(CHANNEL_BUZZ, prefs.musicvol)
-		mob.update_music_volume(CHANNEL_CMUSIC1, prefs.musicvol)
-		mob.update_music_volume(CHANNEL_CMUSIC2, prefs.musicvol)
-		mob.update_music_volume(CHANNEL_CMUSIC3, prefs.musicvol)
-		mob.update_music_volume(CHANNEL_CMUSIC4, prefs.musicvol)
 
 /client/verb/volume_power_menu()
 	set category = "Options"
@@ -91,16 +87,19 @@
 			prefs.mastervol = vol
 		if("music")
 			prefs.musicvol = vol
+			mob?.update_music_volume(CHANNEL_MUSIC, prefs.musicvol)
 			mob?.update_music_volume(CHANNEL_ADMIN, prefs.musicvol)
-			mob?.update_music_volume(CHANNEL_BUZZ, prefs.musicvol)
-			mob?.update_music_volume(CHANNEL_CMUSIC1, prefs.musicvol)
-			mob?.update_music_volume(CHANNEL_CMUSIC2, prefs.musicvol)
-			mob?.update_music_volume(CHANNEL_CMUSIC3, prefs.musicvol)
-			mob?.update_music_volume(CHANNEL_CMUSIC4, prefs.musicvol)
+		if("combat")
+			prefs.combatmusicvol = vol
+			if(mob?.cmode)
+				mob.update_music_volume(CHANNEL_BUZZ, prefs.combatmusicvol)
+				mob.update_music_volume(CHANNEL_CMUSIC1, prefs.combatmusicvol)
+				mob.update_music_volume(CHANNEL_CMUSIC2, prefs.combatmusicvol)
+				mob.update_music_volume(CHANNEL_CMUSIC3, prefs.combatmusicvol)
+				mob.update_music_volume(CHANNEL_CMUSIC4, prefs.combatmusicvol)
 		if("ambience")
 			prefs.ambiencevol = vol
 			mob?.update_channel_volume(CHANNEL_AMBIENCE, prefs.ambiencevol)
-			mob?.update_channel_volume(CHANNEL_MUSIC, prefs.ambiencevol)
 			mob?.update_channel_volume(CHANNEL_RAIN, prefs.ambiencevol)
 		if("lobby")
 			prefs.lobbymusicvol = vol
@@ -136,10 +135,11 @@
 	if(!owner?.prefs)
 		return data
 
-	data["master"] = owner.prefs.mastervol
-	data["music"] = owner.prefs.musicvol
-	data["ambience"] = owner.prefs.ambiencevol
-	data["lobby"] = owner.prefs.lobbymusicvol
+	data["master"] = isnum(owner.prefs.mastervol) ? owner.prefs.mastervol : initial(owner.prefs.mastervol)
+	data["music"] = isnum(owner.prefs.musicvol) ? owner.prefs.musicvol : initial(owner.prefs.musicvol)
+	data["combat"] = isnum(owner.prefs.combatmusicvol) ? owner.prefs.combatmusicvol : initial(owner.prefs.combatmusicvol)
+	data["ambience"] = isnum(owner.prefs.ambiencevol) ? owner.prefs.ambiencevol : initial(owner.prefs.ambiencevol)
+	data["lobby"] = isnum(owner.prefs.lobbymusicvol) ? owner.prefs.lobbymusicvol : initial(owner.prefs.lobbymusicvol)
 	return data
 
 /datum/volume_power_menu/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
@@ -162,6 +162,7 @@
 /client/verb/show_rolls()
 	set category = "Options"
 	set name = "ShowRolls"
+	set hidden = 1
 
 	if(prefs)
 		prefs.showrolls = !prefs.showrolls
@@ -200,7 +201,6 @@
 		prefs.save_preferences()
 
 		mob.update_channel_volume(CHANNEL_AMBIENCE, prefs.ambiencevol)
-		mob.update_channel_volume(CHANNEL_MUSIC, prefs.ambiencevol)
 		mob.update_channel_volume(CHANNEL_RAIN, prefs.ambiencevol)
 
 /client/verb/change_lobby_music_vol()
