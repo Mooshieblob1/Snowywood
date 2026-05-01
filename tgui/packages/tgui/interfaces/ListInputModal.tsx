@@ -180,7 +180,7 @@ export const ListInputModal = (props) => {
             {!searchBarVisible && <Divider />}
             <Stack.Item>
               <Stack align="center" fill justify="space-around">
-                {enable_preview && (
+                {!!enable_preview && (
                   <Stack.Item>
                     <Button
                       color="transparent"
