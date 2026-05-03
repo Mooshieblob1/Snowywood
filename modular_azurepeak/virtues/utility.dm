@@ -221,7 +221,7 @@
 
 /datum/virtue/utility/mean
 	name = "Mean"
-	desc = "Years of hardship and strife have left me with a chip on my shoulder, and a quick temper. I have learnt how to cause pain"
+	desc = "Despite your unorthodox tastes, you know how to keep a partner off-guard and on their back. Sometimes accidents happen in the heat of passion or you enjoy making them, sharing a bed with you is a gamble. You're always prepared to handle a guest with the toys you keep stashed."
 	added_traits = list(TRAIT_DEATHBYSNUSNU, TRAIT_NUTCRACKER)
 	added_stashed_items = list("Bag of Fetish Gear" = /obj/item/storage/roguebag/fetish)
 

@@ -133,6 +133,7 @@
 		/obj/item/clothing/mask/rogue/blindfold,
 		/obj/item/chastity/chastity_cage,
 		/obj/item/chastity/chastity_belt,
+		/obj/item/reagent_containers/glass/bottle/alchemical/emberwine,
 		/obj/item/dildo/wood,
 		/obj/item/natural/cloth,
 		/obj/item/rope/chain,
