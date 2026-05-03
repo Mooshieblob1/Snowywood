@@ -248,12 +248,10 @@
 /datum/anvil_recipe/armor/iron/chaincoif
 	name = "Chain Coif, Iron"
 	created_item = /obj/item/clothing/neck/roguetown/chaincoif/iron
-	createditem_num = 1
 
 /datum/anvil_recipe/armor/iron/gorget
 	name = "Gorget, Iron"
 	created_item = /obj/item/clothing/neck/roguetown/gorget
-	createditem_num = 1
 
 /datum/anvil_recipe/armor/iron/bevor
 	name = "Bevor, Iron"
@@ -287,7 +285,7 @@
 	created_item = /obj/item/clothing/suit/roguetown/armor/plate/full/iron
 
 /datum/anvil_recipe/armor/iron/chainglove
-	name = "Chain Gauntlets, Iron"
+	name = "Chain Gauntlets, Iron (x2)"
 	created_item = /obj/item/clothing/gloves/roguetown/chain/iron
 	createditem_num = 2
 
@@ -316,19 +314,16 @@
 /datum/anvil_recipe/armor/iron/mask
 	name = "Mask, Iron"
 	created_item = /obj/item/clothing/mask/rogue/facemask
-	createditem_num = 1
 	craftdiff = 0
 
 /datum/anvil_recipe/armor/iron/mask/hound
 	name = "Hound Mask, Iron"
 	created_item = /obj/item/clothing/mask/rogue/facemask/hound
-	createditem_num = 1
 	craftdiff = 0
 
 /datum/anvil_recipe/armor/iron/wildguard
 	name = "Wild Guard, Iron"
 	created_item = /obj/item/clothing/mask/rogue/wildguard
-	createditem_num = 1
 
 /datum/anvil_recipe/armor/iron/splintarms
 	name = "Splinted Bracers (+1 Leather Bracers)" //you modify the bracers to have splints and cover the arm way more
@@ -338,7 +333,6 @@
 /datum/anvil_recipe/armor/iron/bracers
 	name = "Plate Bracers, Iron"
 	created_item = /obj/item/clothing/wrists/roguetown/bracers/iron
-	createditem_num = 1
 
 /datum/anvil_recipe/armor/iron/jackchain
 	name = "Jack Chain, Iron"
@@ -347,7 +341,6 @@
 /datum/anvil_recipe/armor/iron/boot
 	name = "Light Plated Boots, Iron"
 	created_item = /obj/item/clothing/shoes/roguetown/boots/armor/iron
-	createditem_num = 1
 
 /datum/anvil_recipe/armor/iron/skullcap
 	name = "Skullcap, Iron"
@@ -455,12 +448,10 @@
 /datum/anvil_recipe/armor/steel/chaincoif
 	name = "Chain Coif, Steel"
 	created_item = /obj/item/clothing/neck/roguetown/chaincoif
-	createditem_num = 1
 
 /datum/anvil_recipe/armor/steel/chainmantle
 	name = "Chain Mantle, Steel"
 	created_item = /obj/item/clothing/neck/roguetown/chaincoif/chainmantle
-	createditem_num = 1
 
 /datum/anvil_recipe/armor/steel/fullchaincoif
 	name = "Full Chain Coif, Steel (+1 steel)"
@@ -468,14 +459,13 @@
 	created_item = /obj/item/clothing/neck/roguetown/chaincoif/full
 
 /datum/anvil_recipe/armor/steel/chainglove
-	name = "Chain Gauntlets, Steel"
+	name = "Chain Gauntlets, Steel (x2)"
 	created_item = /obj/item/clothing/gloves/roguetown/chain
 	createditem_num = 2
 
 /datum/anvil_recipe/armor/steel/plateglove
 	name = "Plate Gauntlets, Steel"
 	created_item = /obj/item/clothing/gloves/roguetown/plate
-	createditem_num = 1
 
 /datum/anvil_recipe/armor/steel/chainleg
 	name = "Chain Chausses, Steel"
@@ -486,12 +476,12 @@
 	created_item = /obj/item/clothing/under/roguetown/chainlegs/kilt
 
 /datum/anvil_recipe/armor/steel/brayette
-	name = "Brayette, Steel"
+	name = "Brayette, Steel (x2)"
 	created_item = /obj/item/clothing/under/roguetown/brayette
 	createditem_num = 2
 
 /datum/anvil_recipe/armor/steel/chainskirt
-	name = "Chain Skirt, Steel"
+	name = "Chain Skirt, Steel (x2)"
 	created_item = /obj/item/clothing/under/roguetown/chainlegs/skirt
 	createditem_num = 2
 
@@ -528,7 +518,6 @@
 /datum/anvil_recipe/armor/steel/platebracer
 	name = "Plate Bracers, Steel"
 	created_item = /obj/item/clothing/wrists/roguetown/bracers
-	createditem_num = 1
 
 /datum/anvil_recipe/armor/steel/helmetnasal
 	name = "Nasal Helmet, Steel"
@@ -635,18 +624,15 @@
 /datum/anvil_recipe/armor/steel/plateboot
 	name = "Plated Boots, Steel"
 	created_item = /obj/item/clothing/shoes/roguetown/boots/armor
-	createditem_num = 1
 
 /datum/anvil_recipe/armor/steel/mask
 	name = "Mask, Steel"
 	created_item = /obj/item/clothing/mask/rogue/facemask/steel
-	createditem_num = 1
 	craftdiff = 2
 
 /datum/anvil_recipe/armor/steel/mask/hound
 	name = "Hound Mask, Steel"
 	created_item = /obj/item/clothing/mask/rogue/facemask/steel/hound
-	createditem_num = 1
 	craftdiff = 2
 
 /datum/anvil_recipe/armor/steel/astratahelm

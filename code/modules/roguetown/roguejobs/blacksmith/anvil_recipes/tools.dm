@@ -309,12 +309,10 @@
 /datum/anvil_recipe/tools/steel/chefknife
 	name = "Chef's Knife"
 	created_item = /obj/item/rogueweapon/huntingknife/chefknife
-	createditem_num = 1
 
 /datum/anvil_recipe/tools/steel/cleaver
 	name = "Cleaver"
 	created_item = /obj/item/rogueweapon/huntingknife/cleaver
-	createditem_num = 1
 
 /datum/anvil_recipe/tools/steelscissors
 	name = "Scissors"
