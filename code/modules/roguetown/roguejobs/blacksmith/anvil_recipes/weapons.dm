@@ -54,7 +54,7 @@
 
 /datum/anvil_recipe/weapons/holysteel
 	abstract_type = /datum/anvil_recipe/weapons/holysteel
-	req_bar = /obj/item/ingot/holysteel
+	req_bar = /obj/item/ingot/steelholy
 	craftdiff = SKILL_LEVEL_MASTER
 
 /datum/anvil_recipe/weapons/blacksteel

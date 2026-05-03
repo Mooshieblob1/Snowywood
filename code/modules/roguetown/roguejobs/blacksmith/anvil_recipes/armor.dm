@@ -46,7 +46,7 @@
 	craftdiff = SKILL_LEVEL_MASTER
 
 /datum/anvil_recipe/armor/blessedsilver
-	abstract_type = /datum/anvil_recipe/armor/blessedsilver/bullion
+	abstract_type = /datum/anvil_recipe/armor/blessedsilver
 	req_bar = /obj/item/ingot/silverblessed
 	craftdiff = SKILL_LEVEL_MASTER
 
