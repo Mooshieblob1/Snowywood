@@ -1095,7 +1095,7 @@
 	sellprice = 140
 
 /obj/item/rogueweapon/sword/sabre/iron
-	name = "iron saber"
+	name = "iron sabre"
 	desc = "A Naledian sword mass produced for line infantry. Its fittings are simple, munitions grade, but the construction is sturdy and the blade as threatening \
 	as any."
 	smeltresult = /obj/item/ingot/iron
