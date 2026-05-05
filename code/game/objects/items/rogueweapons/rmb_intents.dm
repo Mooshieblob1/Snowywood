@@ -166,7 +166,7 @@
 	if(user.has_status_effect(/datum/status_effect/debuff/feintcd))
 		return
 	var/mob/living/L = target
-	if (L.client && !L.cmode)
+	if (L.client && !L.cmode && !L.has_status_effect(/datum/status_effect/buff/clash))
 		playsound(user, 'sound/combat/feint.ogg', 100, TRUE)
 		user.visible_message(span_danger("[user] attempts to feint an attack at [L], but only makes a fool of themselves!"))
 		user.OffBalance(3 SECONDS)
