@@ -283,8 +283,8 @@
 
 
 /datum/status_effect/buff/t3heart
-    id = "t3heart"
-    alert_type = /atom/movable/screen/alert/status_effect/buff/t3heart
+	id = "t3heart"
+	alert_type = /atom/movable/screen/alert/status_effect/buff/t3heart
 
 /atom/movable/screen/alert/status_effect/buff/t3heart
 	name = "Corrupted heart"

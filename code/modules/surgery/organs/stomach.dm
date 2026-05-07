@@ -189,8 +189,8 @@
 		REMOVE_TRAIT(M, TRAIT_WILD_EATER , ORGAN_TRAIT)
 
 /datum/status_effect/buff/t3stomach
-    id = "t3stomach"
-    alert_type = /atom/movable/screen/alert/status_effect/buff/t3stomach
+	id = "t3stomach"
+	alert_type = /atom/movable/screen/alert/status_effect/buff/t3stomach
 
 /atom/movable/screen/alert/status_effect/buff/t3stomach
 	name = "Corrupted stomach"

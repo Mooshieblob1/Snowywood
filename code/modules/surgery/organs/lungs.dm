@@ -111,8 +111,8 @@
 
 
 /datum/status_effect/buff/t3lungs
-    id = "t3lungs"
-    alert_type = /atom/movable/screen/alert/status_effect/buff/t3lungs
+	id = "t3lungs"
+	alert_type = /atom/movable/screen/alert/status_effect/buff/t3lungs
 
 /atom/movable/screen/alert/status_effect/buff/t3lungs
 	name = "Corrupted lungs"
