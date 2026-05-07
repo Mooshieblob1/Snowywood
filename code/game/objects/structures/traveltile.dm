@@ -132,7 +132,6 @@
 		perform_travel(T, L)
 		return TRUE
 	return FALSE
-
 /obj/structure/fluff/traveltile/proc/perform_travel(obj/structure/fluff/traveltile/T, mob/living/L)
 	if(!L.restrained(ignore_grab = TRUE)) // heavy-handedly prevents using prisoners to metagame camp locations. pulledby would stop this but prisoners can also be kicked/thrown into the tile repeatedly
 		for(var/mob/living/carbon/human/H in hearers(6,src))
