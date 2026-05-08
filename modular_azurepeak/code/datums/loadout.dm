@@ -2087,7 +2087,6 @@ GLOBAL_LIST_EMPTY(loadout_items)
 	name = "Chain Leash"
 	path = /obj/item/leash/chain
 
-
 /datum/loadout_item/magic_recipes
 	name = "Guide to Arcyne"
 	path = /obj/item/recipe_book/magic
@@ -2127,6 +2126,18 @@ GLOBAL_LIST_EMPTY(loadout_items)
 /datum/loadout_item/cooking_recipes
 	name = "Guide to Cooking"
 	path = /obj/item/recipe_book/cooking
+
+/datum/loadout_item/tenbibble
+	name = "The Verses and Acts of the Ten"
+	path = /obj/item/book/rogue/bibble
+
+/datum/loadout_item/psybibble
+	name = "Tome of Psydon"
+	path = /obj/item/book/rogue/bibble/psy
+
+/datum/loadout_item/zizobibble
+	name = "Lexicon of Her Truth"
+	path = /obj/item/book/rogue/bibble/zizo
 
 //COSMETICS (Perfumes & Lipsticks)
 
