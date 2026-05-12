@@ -86,6 +86,103 @@
 	var/cached_mailer
 	var/cached_mailedto
 	var/trapped
+	/// Raw text source used by the tgui writer panel.
+	var/writer_body
+
+/obj/item/paper/proc/get_writer_body()
+	if(!writer_body)
+		if(info)
+			writer_body = strip_html_simple(info, maxlen)
+		else
+			writer_body = ""
+	return writer_body
+
+/obj/item/paper/proc/can_use_writer(mob/living/carbon/human/user, obj/item/P)
+	if(!user)
+		return FALSE
+	if(is_blind(user))
+		return FALSE
+	if(!user.can_read(src))
+		return FALSE
+	if(mailer)
+		return FALSE
+	if(!P)
+		P = user.get_active_held_item()
+	if(!istype(P, /obj/item/natural/thorn) && !istype(P, /obj/item/natural/feather))
+		return FALSE
+	if(istype(src, /obj/item/paper/scroll))
+		var/obj/item/paper/scroll/S = src
+		if(!S.open)
+			return FALSE
+	return TRUE
+
+/obj/item/paper/proc/open_writer_panel(mob/living/carbon/human/user, obj/item/P)
+	if(!can_use_writer(user, P))
+		return FALSE
+	ui_interact(user)
+	return TRUE
+
+/obj/item/paper/ui_interact(mob/user, datum/tgui/ui)
+	ui = SStgui.try_update_ui(user, src, ui)
+	if(!ui)
+		ui = new(user, src, "PaperWriterPanel", "Letter Editor")
+		ui.open()
+
+/obj/item/paper/ui_data(mob/user)
+	var/list/data = list()
+	var/body = get_writer_body()
+	data["body"] = body
+	data["maxlen"] = maxlen
+	data["body_len"] = length(body)
+	return data
+
+/obj/item/paper/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
+	if(..())
+		return TRUE
+
+	var/mob/living/carbon/human/user = ui.user
+	if(!user)
+		return TRUE
+
+	switch(action)
+		if("save")
+			var/obj/item/P = user.get_active_held_item()
+			if(!can_use_writer(user, P))
+				to_chat(user, span_warning("I need a feather or thorn in hand to write."))
+				return TRUE
+
+			var/new_body = params["body"] || ""
+			new_body = copytext(new_body, 1, maxlen + 1)
+
+			fields = 0
+			var/new_info = parsepencode(new_body, P, user, FALSE)
+			if(!new_info)
+				new_info = ""
+			if(length(new_info) > maxlen)
+				to_chat(user, span_warning("Too long. Try again."))
+				return TRUE
+
+			writer_body = new_body
+			info = new_info
+			updateinfolinks()
+			update_icon_state()
+			playsound(src, 'sound/items/write.ogg', 100, FALSE)
+			to_chat(user, span_notice("I finish writing on [src]."))
+			return TRUE
+
+		if("clear")
+			writer_body = ""
+			info = ""
+			fields = 0
+			updateinfolinks()
+			update_icon_state()
+			return TRUE
+
+		if("close")
+			ui.close()
+			return TRUE
+
+	return FALSE
 
 /obj/item/paper/examine()
 	. = ..()
@@ -446,7 +543,7 @@
 			to_chat(user, "<span class='warning'>[src] is full of verba.</span>")
 			return
 		if(user.can_read(src))
-			format_browse(info_links, user)
+			open_writer_panel(user, P)
 			update_icon_state()
 			return
 		else
