@@ -36,7 +36,6 @@
 	job_bitflag = BITFLAG_ROYALTY
 
 /datum/outfit/job/roguetown/hand/pre_equip(mob/living/carbon/human/H)
-	backpack_contents = list(/obj/item/seal/hand = 1)
 	H.verbs |= /datum/job/roguetown/hand/proc/remember_agents
 
 /datum/job/roguetown/hand/after_spawn(mob/living/L, mob/M, latejoin = TRUE)

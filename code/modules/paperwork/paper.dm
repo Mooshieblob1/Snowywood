@@ -261,6 +261,9 @@
 		return
 	name = initial(name)
 	throw_range = initial(throw_range)
+	if(seal_label)
+		icon_state = "paper_sealed"
+		return
 	if(info)
 		icon_state = "paperwrite"
 		return
@@ -586,6 +589,7 @@
 			seal_color = seal.seal_color
 			seal_is_official = seal.seal_is_official
 			seal_broken = FALSE
+			update_icon()
 			user.visible_message(span_notice("[user] presses [seal] onto [src], sealing it with [seal.seal_label]."))
 			return
 		else
@@ -607,6 +611,7 @@
 			seal_color = ring.seal_color
 			seal_is_official = ring.seal_is_official
 			seal_broken = FALSE
+			update_icon()
 			user.visible_message(span_notice("[user] presses [ring] onto [src], sealing it with an inquisitorial seal."))
 			return
 		else

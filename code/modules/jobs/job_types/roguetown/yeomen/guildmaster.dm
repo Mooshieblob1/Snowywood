@@ -91,7 +91,6 @@
 			/obj/item/contraption/linker/master = 1,
 			/obj/item/mini_flagpole/blacksmith = 1,
 			/obj/item/mini_flagpole/artificer = 1,
-			/obj/item/seal/guildmaster = 1,
 			)
 		belt = /obj/item/storage/belt/rogue/leather
 		beltl = /obj/item/storage/belt/rogue/pouch/coins/rich

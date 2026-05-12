@@ -66,7 +66,6 @@
 		/obj/item/quiver/bullet/lead,
 		/obj/item/powderflask,
 		/obj/item/mini_flagpole/merchant = 1,
-		/obj/item/seal/merchant = 1,
 	)
 	neck = /obj/item/clothing/neck/roguetown/horus
 	head = /obj/item/clothing/head/roguetown/chaperon/brown

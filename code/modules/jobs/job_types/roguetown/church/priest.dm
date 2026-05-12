@@ -123,7 +123,6 @@ GLOBAL_LIST_EMPTY(heretical_players)
 		/obj/item/rogueweapon/huntingknife/idagger/steel/holysee = 1,	//Unique knife from the Holy See
 		/obj/item/rogueweapon/scabbard/sheath = 1,
 		/obj/item/mini_flagpole/church,
-		/obj/item/seal/prelate = 1,
 	)
 	if(H.age == AGE_OLD)
 		H.adjust_skillrank_up_to(/datum/skill/magic/holy, 6, TRUE)
