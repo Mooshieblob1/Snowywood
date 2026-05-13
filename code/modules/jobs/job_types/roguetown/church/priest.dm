@@ -111,7 +111,7 @@ GLOBAL_LIST_EMPTY(priest_swap_timers)
 /datum/outfit/job/roguetown/priest/basic/pre_equip(mob/living/carbon/human/H)
 	..()
 	H.adjust_blindness(-3)
-	neck = /obj/item/clothing/neck/roguetown/psicross/silver/astrata
+	neck = /obj/item/clothing/neck/roguetown/psicross/silver/undivided
 	head = /obj/item/clothing/head/roguetown/priestmask
 	shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt/priest
 	pants = /obj/item/clothing/under/roguetown/tights/black

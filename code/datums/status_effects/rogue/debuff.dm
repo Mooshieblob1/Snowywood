@@ -1135,6 +1135,7 @@
 	alert_type = /atom/movable/screen/alert/status_effect/debuff/overheat
 	duration = 10 SECONDS
 	effectedstats = list(STATKEY_SPD = 2, STATKEY_WIL = -4)
+
 /datum/status_effect/debuff/overheat/on_apply()
 	. = ..()
 	var/mob/living/carbon/C = owner
@@ -1149,3 +1150,14 @@
 	name = "overheating"
 	desc = "My frame is overheating!"
 	icon_state = "fire"
+
+/datum/status_effect/debuff/kiss_ecstasy
+	id = "kiss_ecstasy"
+	alert_type = /atom/movable/screen/alert/status_effect/debuff/kiss_ecstasy
+	effectedstats = list(STATKEY_CON = -2, STATKEY_WIL = -2)
+	duration = 30 SECONDS
+
+/atom/movable/screen/alert/status_effect/debuff/kiss_ecstasy
+	name = "The Kiss"
+	desc = "A terrible sweetness floods my senses."
+	icon_state = "vampirebite"

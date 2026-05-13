@@ -243,3 +243,92 @@
 2026-05-12:
   zeroisthebiggay:
   - rscadd: revenants can wear socks
+2026-05-13:
+  DelineFortune:
+  - rscadd: Hemophage debuffs their targets on bite, but their bite also restores
+      their health+stamina now
+  Guidesu:
+  - rscadd: Ports AP armour storage like the helmet one.
+  Jamdrawers:
+  - balance: 'chain gloves are cheaper to smith at two pairs per bar. Full chain coifs
+      are more expensive to smith at two bars per full coif.
+
+      Alchemical Transmutation Recipes such as stone-to-coal and coal-to-iron have
+      a higher skill requirement
+
+      iron dust can be crafted into iron ore with smelting skill'
+  - refactor: cleans up and compresses code for lots of crafting recipes
+  JustMeTheIInd:
+  - rscadd: Amulet of Matthios
+  - rscadd: Amulet of Graggar
+  - rscadd: Amulet of Baotha
+  - rscadd: Silver amulet of Ten
+  - rscadd: Amulet of Ten
+  - rscadd: Golden Z-cross
+  - rscadd: "Bronze amulet of Graggar.\n<!-- Both :cl:'s are required for the changelog\
+      \ to work! You can put your name to the right of the first :cl: if you want\
+      \ to overwrite your GitHub username as author ingame. -->\n<!-- You can use\
+      \ multiple of the same prefix (they're only used for the icon ingame) and delete\
+      \ the unneeded ones. Despite some of the tags, changelogs should generally represent\
+      \ how a player might be affected by the changes rather than a summary of the\
+      \ PR's contents. -->\n<!-- By contributing to this codebase, you confirm that\
+      \ any code and sprites you provide are legal to share and will be licensed under\
+      \ the terms specified in README.md \u2014 AGPLv3 for code and CC-BY-SA 3.0 for\
+      \ assets, unless otherwise stated. You acknowledge that the project maintainers\
+      \ are under no obligation to remove any materials that do not violate these\
+      \ licenses. -->"
+  NotGoldenglow:
+  - balance: You no longer fall over and eat shit if you step on glass shards as a
+      tough skin haver.
+  The-Sun-In-Splendour:
+  - balance: inspector now has MASTERS in their chosen weapon. gulp.
+  - balance: inspector now gets a slurbow
+  - balance: inspector now gets expert crossbow
+  - balance: inspector loses 1 con for 1 per
+  - balance: inspector's inquisitorial hat now has 225 integrity from 180
+  - balance: inspector's armoured inquisitorial duster now has 315 integrity from
+      270
+  - balance: inspector's armoured inquisitorial duster now offers the PSYDONIC ENDURANCE
+      buff, to offset the loss of DODGE EXPERT
+  - balance: garrote can now be fixed with regular ropes rather than only inquiry
+      cordage
+  - balance: confessor now has a different statspread of 3PER, 2SPD, 2WIL
+  - balance: confessor's coat now has 270 durability, same as heavy leather coat
+  - balance: confessor's hood and inquisitorial hat now both fireproof. ENDURE your
+      burn wounds with style!
+  Vizoplez:
+  - bugfix: Amulets causing a ton of runtimes in foot slot
+  - bugfix: Being able to point at, examine, and see invisible sneak users via alt-rightclicking
+  - balance: Gnoll system moved to use invisibility atop of alpha=0
+  - balance: PER now allows for passively spotting sneaked players. Ratio may be changed
+  - rscadd: Invisi-Sneaking (No more metagaming via pointing, guardseman!)
+  - balance: You are now de-sneaked for exactly 4 seconds upon attacking any object,
+      or player. This does NOT affect grappling, to note, so kidnapping is still viable!
+  - balance: You are now de-sneaked for exactly 0.5 seconds upon someone bumping into
+      you.
+  Xander3359:
+  - bugfix: Riding a mountable harpy flying no longer kills you
+  - bugfix: Fixed the offsets of riding a flying harpy
+  - balance: Mountable virtue has been buffed to no longer require strength as a mount
+  - rscadd: Dying with critical weakness forces out an emote so that people can recognize
+      you are no longer alive.
+  ophaq:
+  - rscadd: RGB color changing to magelight motes. Middle click the mage hand to set
+      it, alt+rightclick to reset.
+  - qol: Nearly doubles prestidigitation cleaning speed at the cost of a bit more
+      stamina.
+  - bugfix: Essence of lumber spawning from logs now spawns instead of the wilderness
+      kind.
+  - rscadd: You can get essence of lumber from sawing logs into planks now.
+  - qol: Shovels dig up stumps twice as fast as chopping with an axe does.
+  zeroisthebiggay:
+  - refactor: Reworked Exposed. It is now consumed on-hit to deal increased damage.
+      Feint applies a lower version of this.
+  - balance: Feint CD increased to twenty seconds.
+  - balance: You can no longer jump into offbalance people to knock them over.
+  - balance: The offbalance period after baiting someone twice has been doubled.
+  - balance: You can no longer feint people who are not in combat mode, putting you
+      on a three second offbalance if you do.
+  - balance: Feints will always succeed on someone guarding.
+  - balance: Baits no longer need line of sight.
+  - balance: Slightly reduced guard duration.
