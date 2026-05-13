@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Box,
   Button,
-  Input,
   NoticeBox,
   Section,
   Stack,
@@ -38,7 +37,6 @@ export const PaperWriterPanel = () => {
 
   const [draft, setDraft] = useState(initialDraft || '');
   const [font, setFont] = useState(backendFont || 'default');
-  const [colorHex, setColorHex] = useState('862f20');
   const [previewDirty, setPreviewDirty] = useState(false);
   const draftInputRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -110,15 +108,8 @@ export const PaperWriterPanel = () => {
     });
   };
 
-  const sanitizeColorHex = (value: string) => {
-    const normalized = value.replace('#', '').trim().toUpperCase();
-    return /^[0-9A-F]{6}$/.test(normalized) ? normalized : '862F20';
-  };
-
   const insertColorBlock = (hexValue: string) => {
-    const cleanHex = sanitizeColorHex(hexValue);
-    setColorHex(cleanHex);
-    insertToken(`-=${cleanHex}`, '=-');
+    insertToken(`-=${hexValue}`, '=-');
   };
 
   const remaining = Math.max(0, maxlen - draft.length);
@@ -168,17 +159,6 @@ export const PaperWriterPanel = () => {
                 </Stack.Item>
                 <Stack.Item>
                   <Button onClick={() => insertColorBlock('8B6914')}>Gold</Button>
-                </Stack.Item>
-                <Stack.Item grow>
-                  <Input
-                    value={colorHex}
-                    onChange={(value) => setColorHex(value.toUpperCase())}
-                    placeholder="RRGGBB"
-                    fluid
-                  />
-                </Stack.Item>
-                <Stack.Item>
-                  <Button onClick={() => insertColorBlock(colorHex)}>Insert Color</Button>
                 </Stack.Item>
               </Stack>
 
