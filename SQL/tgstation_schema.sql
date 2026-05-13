@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS `snowywood`;
+USE `snowywood`;
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -581,28 +583,32 @@ CREATE TABLE `whitelists` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-DELIMITER $$
-CREATE PROCEDURE `set_poll_deleted`(
-	IN `poll_id` INT
-)
+DROP PROCEDURE IF EXISTS `set_poll_deleted`;
+
+DELIMITER //
+
+CREATE PROCEDURE `set_poll_deleted`(IN `poll_id` INT)
 SQL SECURITY INVOKER
 BEGIN
-UPDATE `poll_question` SET deleted = 1 WHERE id = poll_id;
-UPDATE `poll_option` SET deleted = 1 WHERE pollid = poll_id;
-UPDATE `poll_vote` SET deleted = 1 WHERE pollid = poll_id;
-UPDATE `poll_textreply` SET deleted = 1 WHERE pollid = poll_id;
-END
-$$
-CREATE TRIGGER `role_timeTlogupdate` AFTER UPDATE ON `role_time` FOR EACH ROW BEGIN INSERT into role_time_log (ckey, job, delta) VALUES (NEW.CKEY, NEW.job, NEW.minutes-OLD.minutes);
-END
-$$
-CREATE TRIGGER `role_timeTloginsert` AFTER INSERT ON `role_time` FOR EACH ROW BEGIN INSERT into role_time_log (ckey, job, delta) VALUES (NEW.ckey, NEW.job, NEW.minutes);
-END
-$$
-CREATE TRIGGER `role_timeTlogdelete` AFTER DELETE ON `role_time` FOR EACH ROW BEGIN INSERT into role_time_log (ckey, job, delta) VALUES (OLD.ckey, OLD.job, 0-OLD.minutes);
-END
-$$
+	UPDATE `poll_question` SET deleted = 1 WHERE id = poll_id;
+	UPDATE `poll_option` SET deleted = 1 WHERE pollid = poll_id;
+	UPDATE `poll_vote` SET deleted = 1 WHERE pollid = poll_id;
+	UPDATE `poll_textreply` SET deleted = 1 WHERE pollid = poll_id;
+END//
+
 DELIMITER ;
+
+DROP TRIGGER IF EXISTS `role_timeTlogupdate`;
+CREATE TRIGGER `role_timeTlogupdate` AFTER UPDATE ON `role_time` FOR EACH ROW
+INSERT INTO role_time_log (ckey, job, delta) VALUES (NEW.CKEY, NEW.job, NEW.minutes-OLD.minutes);
+
+DROP TRIGGER IF EXISTS `role_timeTloginsert`;
+CREATE TRIGGER `role_timeTloginsert` AFTER INSERT ON `role_time` FOR EACH ROW
+INSERT INTO role_time_log (ckey, job, delta) VALUES (NEW.ckey, NEW.job, NEW.minutes);
+
+DROP TRIGGER IF EXISTS `role_timeTlogdelete`;
+CREATE TRIGGER `role_timeTlogdelete` AFTER DELETE ON `role_time` FOR EACH ROW
+INSERT INTO role_time_log (ckey, job, delta) VALUES (OLD.ckey, OLD.job, 0-OLD.minutes);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

@@ -18,10 +18,10 @@ $include resources.txt
 SERVERNAME Snowywood
 
 ## Server tagline: This will appear right below the server's title.
-# SERVERTAGLINE 18+ MRP Experiment based of Ratwood code.
+SERVERTAGLINE 18+ MRP Experiment based off Ratwood code.
 
 ## Server SQL name: This is the name used to identify the server to the SQL DB, distinct from SERVERNAME as it must be at most 32 characters.
-# SERVERSQLNAME tgstation
+SERVERSQLNAME snowywood
 
 ## Station name: The name of the station as it is referred to in-game. If commented out, the game will generate a random name instead.
 STATIONNAME ROTWOOD VALE
