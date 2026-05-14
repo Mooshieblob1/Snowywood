@@ -273,15 +273,6 @@
 	// azure peak addition end
 	held_items[/obj/item/reagent_containers/glass/bottle/rogue/emberwine] = list("PRICE" = rand(100,140),"NAME" = "unlabeled emberwine")
 
-/obj/structure/roguemachine/drugmachine/kingsfield
-	name = "KINGSFIELD PURITY"
-
-/obj/structure/roguemachine/drugmachine/kingsfield/Initialize(mapload)
-	. = ..()
-	for(var/I in held_items)
-		held_items[I]["PRICE"] = 0
-	update_icon()
-
 #undef DRUGRADE_MONEYA
 #undef DRUGRADE_MONEYB
 #undef DRUGRADE_WINE
