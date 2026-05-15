@@ -470,21 +470,21 @@
 							I.marquevalue += bonuses
 						budget2change(I.marquevalue, user, "MARQUE")
 						record_round_statistic(STATS_MARQUES_MADE, I.marquevalue)
-					   qdel(I.paired)
-					   qdel(I)
-					   visible_message(span_warning("[user] sends something."))
-					   playsound(loc, 'sound/misc/otavanlament.ogg', 100, FALSE, -1)
-					   playsound(loc, 'sound/misc/disposalflush.ogg', 100, FALSE, -1)
-					   return
-			   else
-				   if(!I.paired.full)
-					   to_chat(user, span_warning("[I.paired] needs to be full of the accused's blood."))
-					   return
-				   to_chat(user, span_warning("[I] is missing a signature."))
-				   return
-		   else
-			   to_chat(user, span_warning("[I] is missing an INDEXER."))
-			   return
+					qdel(I.paired)
+					qdel(I)
+					visible_message(span_warning("[user] sends something."))
+					playsound(loc, 'sound/misc/otavanlament.ogg', 100, FALSE, -1)
+					playsound(loc, 'sound/misc/disposalflush.ogg', 100, FALSE, -1)
+					return
+			else
+				if(!I.paired.full)
+					to_chat(user, span_warning("[I.paired] needs to be full of the accused's blood."))
+					return
+				to_chat(user, span_warning("[I] is missing a signature."))
+				return
+		else
+			to_chat(user, span_warning("[I] is missing an INDEXER."))
+			return
 
 	if(istype(P, /obj/item/paper) || istype(P, /obj/item/smallDelivery))
 		if(inqcoins)
