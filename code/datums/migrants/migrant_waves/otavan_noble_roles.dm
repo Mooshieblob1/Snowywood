@@ -237,7 +237,7 @@
 		/datum/skill/misc/reading = SKILL_LEVEL_MASTER,
 		/datum/skill/magic/holy = SKILL_LEVEL_JOURNEYMAN,
 		/datum/skill/misc/medicine = SKILL_LEVEL_JOURNEYMAN,
-	)Project dmitool: A problem occurred configuring root project 'dmitool'. A problem occurred evaluating root project 'dmitool'. Could not find method compile() for arguments [{group=ar.com.hjg, name=pngj, version=2.1.0}] on object of type
+	)
 
 	subclass_languages = list(
 		/datum/language/otavan,
