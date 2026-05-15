@@ -49,6 +49,7 @@
 	. = ..()
 
 	if(user.restrained() || user.incapacitated())
+		to_chat(user, span_warning("I cannot use this while restrained or incapacitated!"))
 		return FALSE
 
 	if(disguised)
