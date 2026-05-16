@@ -193,7 +193,6 @@
 	color = "#bb9696"
 	anvilrepair = null
 
-
 /obj/item/clothing/shoes/roguetown/shalal
 	name = "babouche"
 	desc = ""
