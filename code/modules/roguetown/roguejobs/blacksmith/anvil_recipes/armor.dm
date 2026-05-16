@@ -536,7 +536,7 @@
 	additional_items = list(/obj/item/ingot/steel,/obj/item/natural/hide/cured)
 	created_item = /obj/item/clothing/suit/roguetown/armor/brigandine/coatplates
 
-/datum/anvil_recipe/armor/iron/lbrigandine
+/datum/anvil_recipe/armor/steel/lbrigandine
 	name = "Light Brigandine, Steel (+1 Cloth)"
 	req_bar = /obj/item/ingot/steel
 	req_blade = /obj/item/blade/steel_plate
