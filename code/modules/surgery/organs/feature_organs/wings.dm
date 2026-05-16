@@ -31,16 +31,16 @@
 /obj/item/organ/wings/proc/add_gradient_overlay(mutable_appearance/standing, gradient_type, gradient_color)
 	if(gradient_type == /datum/hair_gradient/none || isnull(gradient_type))
 		return
+	var/datum/sprite_accessory/accessory = SPRITE_ACCESSORY(accessory_type) // In the case of wings we need to get gradient size too
 	var/datum/hair_gradient/gradient = HAIR_GRADIENT(gradient_type)
-	var/icon/temp = icon(gradient.icon, gradient.icon_state)
-	var/datum/sprite_accessory/accessory = SPRITE_ACCESSORY(accessory_type)
+	var/icon/gradient_icon = icon(accessory.gradient_icon, gradient.icon_state)
 	var/layered_icon_state = accessory.icon_state
 	var/layer_suffix = accessory.get_layer_suffix(-(standing.layer))
 	if(layer_suffix)
 		layered_icon_state = accessory.icon_state + "_[layer_suffix]"
-	var/icon/temp_hair = icon(accessory.icon, layered_icon_state)
-	temp.Blend(temp_hair, ICON_ADD)
-	var/mutable_appearance/gradient_appearance = mutable_appearance(temp)
+	var/icon/hair_icon = icon(accessory.icon, layered_icon_state)
+	gradient_icon.Blend(hair_icon, ICON_ADD)
+	var/mutable_appearance/gradient_appearance = mutable_appearance(gradient_icon)
 	gradient_appearance.color = gradient_color
 	standing.overlays += gradient_appearance
 
