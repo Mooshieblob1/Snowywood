@@ -23,8 +23,9 @@
 	icon_state = "church"
 	first_time_text = "The Garden of the Dead"
 	holy_area = TRUE
-	warden_area = TRUE
-	
+	warden_area = TRUE//eh why not it's got grass I guess
+	deathsight_message = "a hallowed place of eternal rest"
+
 /area/rogue/outdoors/town/rockhill
 	name = "outdoors rockhill"
 	first_time_text = "The Town of Rockhill"
