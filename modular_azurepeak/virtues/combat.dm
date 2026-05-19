@@ -173,11 +173,6 @@
 
 /datum/virtue/combat/rotcured/apply_to_human(mob/living/carbon/human/recipient)
 	recipient.update_body() // applies the rot skin tone stuff
-	recipient.dna.species.soundpack_m = new /datum/voicepack/male/rotman() // this shit might not work
-	recipient.dna.species.soundpack_f = new /datum/voicepack/female/rotman()
-	
-	if(alert(recipient, "Do you SOUND like a deadite?", "I believe I do", "Nay") == "MAKE IT SO") // Ask if they wanna sound like a deadite
-
 
 /datum/virtue/combat/dualwielder
 	name = "Dual Wielder"
