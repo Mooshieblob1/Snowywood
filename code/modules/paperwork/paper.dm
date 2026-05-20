@@ -271,6 +271,13 @@
 			return TRUE
 
 		if("sign")
+			// Accept draft/font inline so the tgui client can send a single atomic
+			// action instead of a separate update_draft + sign (avoids the race under
+			// server time dilation where the debounce timer fires in between).
+			if(!isnull(params["draft"]))
+				writer_draft = copytext(params["draft"], 1, maxlen + 1)
+			if(!isnull(params["font"]))
+				writer_font = sanitize_writer_font(params["font"])
 			append_writer_chunk(user, TRUE)
 			return TRUE
 
@@ -579,9 +586,8 @@
 	if(length(t) < 1)		//No input means nothing needs to be parsed
 		return
 
-	// Writer panel no longer supports large (^text^) or field (%f/%field) tokens.
+	// Writer panel no longer supports large (^text^) tokens.
 	t = replacetext(t, "^", "")
-	t = replacetext(t, regex("%f(?:ield)?(?=\\s|$)", "igm"), "")
 
 	t = parsemarkdown(t, user, iscrayon)
 	var/pen_font = FOUNTAIN_PEN_FONT

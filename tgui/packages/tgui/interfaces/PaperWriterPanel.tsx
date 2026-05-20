@@ -37,9 +37,16 @@ export const PaperWriterPanel = () => {
   const [font, setFont] = useState(backendFont || 'default');
   const [previewDirty, setPreviewDirty] = useState(false);
   const draftInputRef = useRef<HTMLTextAreaElement | null>(null);
+  // Tracks whether the textarea is focused so backend echoes don't override live input.
+  const isFocused = useRef(false);
+  // Holds the pending debounce timer so it can be cancelled explicitly.
+  const debounceHandle = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    setDraft(initialDraft || '');
+    // Only sync from server if the user is not actively typing.
+    if (!isFocused.current) {
+      setDraft(initialDraft || '');
+    }
   }, [initialDraft]);
 
   useEffect(() => {
@@ -68,11 +75,17 @@ export const PaperWriterPanel = () => {
     if (!previewDirty) {
       return;
     }
-    const handle = setTimeout(() => {
+    debounceHandle.current = setTimeout(() => {
       act('update_draft', { draft, font });
       setPreviewDirty(false);
+      debounceHandle.current = null;
     }, 450);
-    return () => clearTimeout(handle);
+    return () => {
+      if (debounceHandle.current !== null) {
+        clearTimeout(debounceHandle.current);
+        debounceHandle.current = null;
+      }
+    };
   }, [previewDirty, draft, font]);
 
   const insertToken = (startToken: string, endToken = '') => {
@@ -200,6 +213,8 @@ export const PaperWriterPanel = () => {
                 }}
                 value={draft}
                 onChange={(event) => pushDraft(event.target.value)}
+                onFocus={() => { isFocused.current = true; }}
+                onBlur={() => { isFocused.current = false; }}
                 placeholder="Write your letter..."
               />
             </Section>
@@ -233,8 +248,14 @@ export const PaperWriterPanel = () => {
                   color="good"
                   icon="signature"
                   onClick={() => {
-                    updatePreview();
-                    act('sign');
+                    // Cancel any pending debounce and send draft+sign as one atomic action
+                    // to avoid the update_draft / sign race under server time dilation.
+                    if (debounceHandle.current !== null) {
+                      clearTimeout(debounceHandle.current);
+                      debounceHandle.current = null;
+                    }
+                    setPreviewDirty(false);
+                    act('sign', { draft, font });
                   }}>
                   Sign
                 </Button>
@@ -244,7 +265,12 @@ export const PaperWriterPanel = () => {
                   color="average"
                   icon="eraser"
                   onClick={() => {
+                    if (debounceHandle.current !== null) {
+                      clearTimeout(debounceHandle.current);
+                      debounceHandle.current = null;
+                    }
                     setDraft('');
+                    setPreviewDirty(false);
                     act('clear');
                   }}>
                   Clear
