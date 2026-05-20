@@ -28,7 +28,7 @@
 | Website                   | Link                                           |
 |---------------------------|------------------------------------------------|
 | Discord          | [discord.gg/MDTM59t8b](https://discord.gg/MDTM59t8b) |
-| Wiki                      | [wiki.ratwood.rip](https://wiki.ratwood.rip/index.php/Main_Page) |
+| Ratwood's Wiki                      | [wiki.ratwood.rip](https://wiki.ratwood.rip/index.php/Main_Page) |
 
 </div>
 
