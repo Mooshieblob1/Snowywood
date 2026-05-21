@@ -53,7 +53,7 @@
 
 /datum/charflaw/addiction/New()
 	..()
-	time = rand(6 MINUTES, 60 MINUTES)
+	time = rand(4 SECONDS, 1 MINUTES)
 	next_sate = world.time + time
 
 // Clean up addiction effects when vice is removed
@@ -259,4 +259,23 @@
 /atom/movable/screen/alert/status_effect/debuff/addiction/nympho
 	name = "Nymphomania"
 	desc = "I must make love. My loins burn with unsated desire."
+	icon_state = "nymphomaniac"
+
+/datum/charflaw/addiction/baothamarked
+	name = "Baothan Marked"
+	desc = "I've been branded by a Baothan mark."
+	time = 45 MINUTES
+	needsate_text = "My brand burns painfully."
+	sated_text = "The brand's glow lessens, relief washing over me..."
+	stress_event = /datum/stressevent/vice/baothamarked
+	debuff = /datum/status_effect/debuff/addiction/baothamarked
+
+/datum/status_effect/debuff/addiction/baothamarked
+	id = "addiction_baothamark"
+	alert_type = /atom/movable/screen/alert/status_effect/debuff/addiction/baothamarked
+	effectedstats = list(STATKEY_CON = -1, STATKEY_WIL = -1)
+
+/atom/movable/screen/alert/status_effect/debuff/addiction/baothamarked
+	name = "Baothan Mania"
+	desc = "That accursed rune. It burns brightly across my flesh, searing my loins with a painful desire for release."
 	icon_state = "nymphomaniac"
