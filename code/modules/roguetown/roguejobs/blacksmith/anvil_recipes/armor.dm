@@ -88,13 +88,12 @@
 	name = "Heart Protector, Bronze (+1 Cured Leather)"
 	additional_items = list(/obj/item/ingot/bronze, /obj/item/natural/hide/cured)
 	created_item = /obj/item/clothing/suit/roguetown/armor/plate/bronze/light
-	craftdiff = 1
+	craftdiff = 2
 
 /datum/anvil_recipe/armor/bronze/cuirass
 	name = "Cuirass, Bronze (+1 Bronze, +1 Cured Leather)"
 	additional_items = list(/obj/item/ingot/bronze, /obj/item/natural/hide/cured)
 	created_item = /obj/item/clothing/suit/roguetown/armor/plate/bronze
-	craftdiff = 2
 
 /datum/anvil_recipe/armor/bronze/halfplate
 	name = "Panoply Assembly, Halved, Bronze (+2 Bronze, +1 Cured Leather, +1 Fur)"
@@ -314,7 +313,6 @@
 /datum/anvil_recipe/armor/iron/mask
 	name = "Mask, Iron"
 	created_item = /obj/item/clothing/mask/rogue/facemask
-	craftdiff = 0
 
 /datum/anvil_recipe/armor/iron/mask/hound
 	name = "Hound Mask, Iron"
@@ -621,7 +619,6 @@
 /datum/anvil_recipe/armor/steel/mask
 	name = "Mask, Steel"
 	created_item = /obj/item/clothing/mask/rogue/facemask/steel
-	craftdiff = 2
 
 /datum/anvil_recipe/armor/steel/mask/hound
 	name = "Hound Mask, Steel"
