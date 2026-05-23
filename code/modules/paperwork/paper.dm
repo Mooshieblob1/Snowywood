@@ -478,6 +478,11 @@
 			laststart = iend + 1
 	return rendered
 
+/obj/item/paper/proc/has_empty_fields()
+	if(!info)
+		return FALSE
+	return !!findtext(info, "<span class=\"paper_field\"></span>")
+
 /obj/item/paper/verb/rename()
 	set name = "Rename paper"
 	set hidden = 1
@@ -749,7 +754,10 @@
 			to_chat(user, "<span class='warning'>[src] is full of verba.</span>")
 			return
 		if(user.can_read(src))
-			open_writer_panel(user, P)
+			if(has_empty_fields())
+				format_browse(build_read_info(TRUE), user)
+			else
+				open_writer_panel(user, P)
 			return
 		else
 			to_chat(user, "<span class='warning'>I can't write.</span>")
