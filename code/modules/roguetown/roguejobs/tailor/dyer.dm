@@ -6,6 +6,9 @@ GLOBAL_LIST_INIT(colorlist, list(
 	"Dunked in Water" = "#bbbbbb",
 	"Mage Grey" = "#6c6c6c",
 	"Sow's skin"="#CE929F",
+	"Salmon Pink"="#FF91A4",
+	"Cherry Blossom"="#FF6699",
+	"Xylix Pink"="#FF3399",
 	"Knight's Red"="#933030",
 	"Royal Red"="#8b2323",
 	"Red Ochre" = "#913831",
@@ -606,7 +609,7 @@ GLOBAL_LIST_INIT(pridelist, list(
 	desc = "A sizeable brush made of the finest mane-hairs. Thick dye adheres to it well."
 	icon_state = "dbrush"
 	w_class = WEIGHT_CLASS_SMALL
-	dropshrink = 0.8
+	dropshrink = 0.7
 	grid_width = 32
 	grid_height = 32
 
