@@ -523,7 +523,6 @@
 		/obj/item/bomb = 10,
 	)
 
-/obj/random/loot/spider_cave
 /obj/effect/spawner/lootdrop/spider_cave
 	name = "weirdly specific dunworld spidercave loot drop"
 	icon_state = "cot"
