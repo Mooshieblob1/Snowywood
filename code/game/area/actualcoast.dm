@@ -2,7 +2,6 @@
 /area/rogue/outdoors/beach
 	name = "Central Coast"
 	icon_state = "beach"
-	warden_area = TRUE
 	ambientsounds = AMB_BEACH
 	ambientnight = AMB_BEACH
 	droning_sound = 'sound/music/area/harbor.ogg'

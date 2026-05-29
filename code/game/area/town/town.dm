@@ -16,6 +16,7 @@
 	converted_type = /area/rogue/indoors/shelter/town
 	first_time_text = "THE CITY OF ROTWOOD VALE"
 	town_area = TRUE
+	warden_area = FALSE
 	deathsight_message = "the city of Rotwood Vale and all its bustling souls"
 
 /area/rogue/outdoors/town/graveyard
