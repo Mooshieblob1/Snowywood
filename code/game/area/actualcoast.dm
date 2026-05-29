@@ -14,7 +14,6 @@
 /area/rogue/outdoors/beach/harbor
 	name = "harbor"
 	icon_state = "harbor"
-	warden_area = TRUE
 	ambientsounds = AMB_BEACH
 	ambientnight = AMB_BEACH
 	ambush_times = null
@@ -23,6 +22,8 @@
 	converted_type = /area/rogue/under/lake
 	first_time_text = "Rockhill Harbor"
 	deathsight_message = "a bustling, windswept harbor"
+	town_area = TRUE
+	//warden_area = FALSE //eh it's probably fine
 
 /area/rogue/outdoors/beach/north
 	name = "Northern Coast"
