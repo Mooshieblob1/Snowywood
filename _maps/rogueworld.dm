@@ -1,1 +1,1 @@
-#define FORCE_MAP "_maps/rogueworld.json"
+//#define FORCE_MAP "_maps/rogueworld.json"

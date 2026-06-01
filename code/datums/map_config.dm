@@ -43,12 +43,12 @@
 		return config
 	if (!config.LoadConfig(filename, error_if_missing))
 		qdel(config)
+		config = null
 		if(default_to_box)
 			config = new /datum/map_config  // Fall back to Dun Manor
 	if (delete_after)
 		fdel(filename)
-	if(config)
-		return config
+	return config
 
 #define CHECK_EXISTS(X) if(!istext(json[X])) { log_world("[##X] missing from json!"); return; }
 /datum/map_config/proc/LoadConfig(filename, error_if_missing)

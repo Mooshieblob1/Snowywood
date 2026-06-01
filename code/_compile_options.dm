@@ -45,6 +45,8 @@
 #endif								//	1 to use the default behaviour;
 									//	2 for preloading absolutely everything;
 
+//#define FORCE_MAP "_maps/roguetest.json"	//Uncomment this to force a specific map configuration to load on startup
+
 #ifdef LOWMEMORYMODE
 #define FORCE_MAP "_maps/roguetest.json"
 #endif

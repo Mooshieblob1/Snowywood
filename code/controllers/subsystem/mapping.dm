@@ -51,12 +51,15 @@ SUBSYSTEM_DEF(mapping)
 
 //dlete dis once #39770 is resolved
 /datum/controller/subsystem/mapping/proc/HACK_LoadMapConfig()
-	if(!config)
+	if(config)
+		return
+	config = load_map_config(error_if_missing = FALSE)
 #ifdef FORCE_MAP
+	if(!config)
 		config = load_map_config(FORCE_MAP)
-#else
-		config = load_map_config(error_if_missing = FALSE)
 #endif
+	if(!config)
+		config = new /datum/map_config
 
 /datum/controller/subsystem/mapping/PreInit()
 	HACK_LoadMapConfig()
