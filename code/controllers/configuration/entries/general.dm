@@ -208,6 +208,9 @@
 /datum/config_entry/string/discordurl
 	config_entry_value = ""
 
+/datum/config_entry/string/discord_webhook_url
+	config_entry_value = ""
+
 /datum/config_entry/string/rulesurl
 	config_entry_value = ""
 

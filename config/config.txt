@@ -242,7 +242,10 @@ USEBLACKLIST
 # SERVER ss13.example.com:2506
 
 ## Discod address
-DISCORDURL https://discord.gg/bx9c7ha5Qk
+DISCORDURL https://discord.gg/EeuYqedWB
+
+## Set this to a Discord webhook URL to receive round start/end notifications
+DISCORD_WEBHOOK_URL https://discord.com/api/webhooks/1511221220740169819/YgtkjttBps1BjoaO8cCj6EUl3rAvXKAiTJ5YRd7KJLjn1sxAAS__wejUOgcv7bieMfoL
 
 ## Wiki address
 WIKIURL https://wiki.moviesfreepremium.xyz/blackstone

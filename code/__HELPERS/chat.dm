@@ -65,6 +65,21 @@ it will be sent to all connected chats.
 		world.TgsChatBroadcast(message, channels_to_use)
 
 /**
+ * Sends a message via a configured Discord webhook (DISCORD_WEBHOOK_URL in config).
+ */
+/proc/send_discord_webhook(message)
+	set waitfor = FALSE
+	var/webhook_url = CONFIG_GET(string/discord_webhook_url)
+	if(!webhook_url)
+		return
+	
+	var/list/payload = list("content" = message)
+	var/json_body = json_encode(payload)
+	var/datum/http_request/request = new()
+	request.prepare(RUSTG_HTTP_METHOD_POST, webhook_url, json_body, list("Content-Type" = "application/json"))
+	request.begin_async()
+
+/**
  * Asynchronously sends a message to TGS admin chat channels.
  *
  * category - The category of the mssage.
