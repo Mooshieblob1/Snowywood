@@ -16,7 +16,7 @@
 	// excluded_turfs = list(/turf/open/floor/rogue/dirt/road)
 	spawnableAtoms = list(/obj/structure/flora/roguetree/palm = 0.5,
 							/obj/structure/flora/roguegrass/bush/desertshrub = 0.5,
-							/obj/structure/flora/roguegrass = 0.5,
+							/obj/structure/flora/roguegrass = 0.6,
 							/obj/structure/flora/roguetree/stump/log = 0.3,
 							/obj/structure/flora/ausbushes/ppflowers = 0.1,
 							/obj/structure/flora/ausbushes/ywflowers = 0.1,
@@ -28,8 +28,8 @@
 							/obj/structure/flora/roguegrass/herb/manabloom = 0.05,
 							/obj/item/magic/manacrystal = 0.05,
 							/obj/structure/flora/roguegrass/herb/random = 0.5,
-							/obj/effect/decal/remains/bear = 0.5,
-							/obj/effect/decal/remains/human = 0.3,)
+							/obj/structure/deadbodyrandom/low = 0.7,
+							/obj/effect/decal/remains/bear = 0.3,)
 	// spawnableTurfs = list(/turf/open/floor/rogue/dirt/road=2,
 	// 					/turf/open/water/swamp=2,)
 	allowed_areas = list(/area/rogue/outdoors/desert, /area/rogue/outdoors/desertdeep, /area/rogue/outdoors/town/grove)
@@ -42,7 +42,7 @@
 	spawnableAtoms = list(/obj/structure/flora/roguetree/palm = 5,
 							/obj/structure/flora/roguegrass/bush/desertshrub = 4,
 							/obj/structure/flora/newtreealt = 4,
-							/obj/structure/flora/roguegrass = 3,
+							/obj/structure/flora/roguegrass/verdant = 5,
 							/obj/structure/flora/roguetree/stump/log = 0.5,
 							/obj/structure/flora/ausbushes/ppflowers = 0.1,
 							/obj/structure/flora/ausbushes/ywflowers = 0.1,
