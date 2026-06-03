@@ -35,3 +35,6 @@
   - balance: Bardic songs now apply their effects based on the user's bard tier.
   coffeecoffeecoffee:
   - balance: ported SR's lunacy embracer changes and limited them to 2 spawns
+2026-06-03:
+  WolfOrion:
+  - bugfix: gives goblins a physical descriptor, just like most everyone else
