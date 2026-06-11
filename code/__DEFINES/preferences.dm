@@ -154,11 +154,13 @@ GLOBAL_LIST_INIT(voice_types_list, list(VOICE_TYPE_MASC, VOICE_TYPE_FEM, VOICE_T
 #define VOICE_PACK_FOP	"Foppish (Masc)"
 #define VOICE_PACK_KNIGHT "Knightly (Masc)"
 #define VOICE_PACK_WARRIOR "Warrior (Masc)"
+#define VOICE_PACK_ROTMAN "Rotman (Masc)"
 #define VOICE_PACK_FEM	"Feminine"
 #define VOICE_PACK_FEM_DAINTY "Dainty (Fem)"
 #define VOICE_PACK_FEM_HAUGHTY "Haughty (Fem)"
 #define VOICE_PACK_FEM_ELF	"Elvish (Fem)"
 #define VOICE_PACK_FEM_DWARF "Dwarvish (Fem)"
+#define VOICE_PACK_ROTWOMAN "Rotman (Fem)"
 
 GLOBAL_LIST_INIT(voice_packs_list, list(
 	VOICE_PACK_DEFAULT = null,
@@ -169,4 +171,6 @@ GLOBAL_LIST_INIT(voice_packs_list, list(
 	VOICE_PACK_FEM = /datum/voicepack/female,
 	VOICE_PACK_FEM_DAINTY = /datum/voicepack/female/dainty,
 	VOICE_PACK_FEM_HAUGHTY = /datum/voicepack/female/haughty,
+	VOICE_PACK_ROTMAN = /datum/voicepack/male/rotman,
+	VOICE_PACK_ROTWOMAN = /datum/voicepack/female/rotman
 ))
