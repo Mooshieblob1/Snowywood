@@ -5,6 +5,7 @@ $include dbconfig.txt
 $include comms.txt
 $include antag_rep.txt
 $include resources.txt
+$include secrets.txt
 
 # You can use the @ character at the beginning of a config option to lock it from being edited in-game
 # Example usage:
@@ -244,8 +245,12 @@ USEBLACKLIST
 ## Discod address
 DISCORDURL https://discord.gg/EeuYqedWB
 
-## Set this to a Discord webhook URL to receive round start/end notifications
-DISCORD_WEBHOOK_URL https://discord.com/api/webhooks/1511221220740169819/YgtkjttBps1BjoaO8cCj6EUl3rAvXKAiTJ5YRd7KJLjn1sxAAS__wejUOgcv7bieMfoL
+## Set this to a Discord webhook URL to receive round start/end notifications.
+## The real value lives in the gitignored config/secrets.txt (loaded via $include above).
+
+## HTTP ingest endpoint of the Discord bot sidecar (see tools/discord_bot/).
+## Empty disables all outbound game->bot events. The matching DISCORD_BOT_SECRET lives in secrets.txt.
+DISCORD_BOT_URL http://127.0.0.1:5000/ingest
 
 ## Wiki address
 WIKIURL https://wiki.moviesfreepremium.xyz/blackstone

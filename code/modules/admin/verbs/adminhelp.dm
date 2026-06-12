@@ -654,6 +654,9 @@ GLOBAL_DATUM_INIT(ahelp_tickets, /datum/admin_help_tickets, new)
 	// Log full player message content in addition to title
 	log_admin_private("Ticket #[id]: [initiator_key_name] -> Admins: [msg]")
 
+	// Relay the ticket to the Discord bot staff channel (no-op if DISCORD_BOT_URL unset).
+	send_bot_event("ahelp", list("id" = id, "sender" = initiator_ckey, "message" = msg))
+
 	//send this msg to all admins
 	for(var/client/X in GLOB.admins)
 		if(play_sound && (X.prefs.toggles & SOUND_ADMINHELP))

@@ -4,11 +4,11 @@
 //Github lets you have it sign the message with a secret that you can validate. This prevents people from faking events.
 //This var should match the secret you configured for this webhook on github.
 //This is required as otherwise somebody could trick the script into leaking the api key.
-$hookSecret = '08ajh0qj93209qj90jfq932j32r';
+$hookSecret = getenv('GH_WEBHOOK_SECRET');
 
 //Api key for pushing changelogs.
 //This requires the public_repo (or repo for private repositories) and read:org permissions
-$apiKey = '209ab8d879c0f987d06a09b9d879c0f987d06a09b9d8787d0a089c';
+$apiKey = getenv('GH_API_KEY');
 
 //The repository auto-updates are sourced from.
 $repoOwnerAndName = "tgstation/tgstation";

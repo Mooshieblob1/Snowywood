@@ -306,6 +306,7 @@ GLOBAL_VAR(restart_counter)
 		testing("tgsavailable passed")
 	
 		send_discord_webhook("**Round ending!**")
+		send_bot_event("round", list("event" = "ending"))
 		
 		var/do_hard_reboot
 		// check the hard reboot counter

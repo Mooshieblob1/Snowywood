@@ -184,6 +184,7 @@ SUBSYSTEM_DEF(ticker)
 //			to_chat(world, span_boldnotice("Welcome to [station_name()]!"))
 			send2chat(new /datum/tgs_message_content("New round starting on [SSmapping.config.map_name]!"), CONFIG_GET(string/chat_announce_new_game))
 			send_discord_webhook("**New round starting on [SSmapping.config.map_name]!**")
+			send_bot_event("round", list("event" = "start", "map" = "[SSmapping.config.map_name]"))
 			
 			current_state = GAME_STATE_PREGAME
 			//Everyone who wants to be an observer is now spawned

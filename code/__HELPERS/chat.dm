@@ -80,6 +80,31 @@ it will be sent to all connected chats.
 	request.begin_async()
 
 /**
+ * Fire-and-forget event to the Discord bot sidecar (DISCORD_BOT_URL in config).
+ *
+ * event_type - short string the bot dispatches on ("round", "ooc", "ahelp").
+ * data - assoc list of extra fields merged into the JSON payload.
+ * Authenticated with the X-Bot-Secret header (DISCORD_BOT_SECRET). No-ops if the bot URL is unset.
+ */
+/proc/send_bot_event(event_type, list/data)
+	set waitfor = FALSE
+	var/bot_url = CONFIG_GET(string/discord_bot_url)
+	if(!bot_url)
+		return
+	var/list/payload = list("type" = event_type)
+	if(islist(data))
+		for(var/k in data)
+			payload[k] = data[k]
+	var/json_body = json_encode(payload)
+	var/list/headers = list("Content-Type" = "application/json")
+	var/secret = CONFIG_GET(string/discord_bot_secret)
+	if(secret)
+		headers["X-Bot-Secret"] = secret
+	var/datum/http_request/request = new()
+	request.prepare(RUSTG_HTTP_METHOD_POST, bot_url, json_body, headers)
+	request.begin_async()
+
+/**
  * Asynchronously sends a message to TGS admin chat channels.
  *
  * category - The category of the mssage.

@@ -211,6 +211,15 @@
 /datum/config_entry/string/discord_webhook_url
 	config_entry_value = ""
 
+/// HTTP ingest endpoint of the Discord bot sidecar (e.g. http://127.0.0.1:5000/ingest). Empty disables outbound bot events.
+/datum/config_entry/string/discord_bot_url
+	config_entry_value = ""
+
+/// Shared secret sent in the X-Bot-Secret header so the bot can authenticate game->bot events. Set in secrets.txt.
+/datum/config_entry/string/discord_bot_secret
+	config_entry_value = ""
+	protection = CONFIG_ENTRY_HIDDEN
+
 /datum/config_entry/string/rulesurl
 	config_entry_value = ""
 

@@ -175,4 +175,52 @@
 	.["extreme_popcap"] = CONFIG_GET(number/extreme_popcap) || 0
 	.["popcap"] = max(CONFIG_GET(number/soft_popcap), CONFIG_GET(number/hard_popcap), CONFIG_GET(number/extreme_popcap)) //generalized field for this concept for use across ss13 codebases
 
+/// Inbound OOC from the Discord bot bridge. Comms-key gated; broadcasts using the same OOC visibility rules as /client/verb/ooc.
+/datum/world_topic/discord_ooc
+	keyword = "discord_ooc"
+	require_comms_key = TRUE
+	/// world.time of recently injected messages, for rate limiting
+	var/static/list/recent_times = list()
+
+/datum/world_topic/discord_ooc/Run(list/input)
+	// The in-game "mute OOC" admin toggle also silences the Discord bridge.
+	if(!GLOB.ooc_allowed)
+		return "OOC disabled"
+	// Rate limit: at most 5 Discord->game OOC messages per 5 seconds.
+	var/now = world.time
+	var/list/kept = list()
+	for(var/t in recent_times)
+		if(now - t <= 5 SECONDS)
+			kept += t
+	recent_times = kept
+	if(length(recent_times) >= 5)
+		return "Rate limited"
+	recent_times += now
+
+	var/sender = input["sender"]
+	var/message = input["message"]
+	if(!message)
+		return "No message"
+	sender = copytext(sanitize(sender), 1, 64)
+	if(!sender)
+		sender = "Discord"
+	message = copytext(sanitize(message), 1, MAX_MESSAGE_LEN)
+	if(!message)
+		return "Empty message"
+
+	var/msg_to_send = "<font color='#7289DA'><EM>\[Discord] [sender]:</EM></font> <span class='message linkify'>[message]</span>"
+	var/post_round = (SSticker.current_state >= GAME_STATE_FINISHED)
+	for(var/client/C in GLOB.clients)
+		if(!post_round)
+			if(!C.holder && !istype(C.mob, /mob/dead/new_player))
+				continue
+			if(C.holder && !C.show_lobby_ooc && !istype(C.mob, /mob/dead/new_player))
+				continue
+		if(!(C.prefs.chat_toggles & CHAT_OOC))
+			continue
+		to_chat(C, type = MESSAGE_TYPE_OOC, html = msg_to_send)
+
+	log_ooc("DISCORD: [sender]: [message]")
+	return "OK"
+
 	

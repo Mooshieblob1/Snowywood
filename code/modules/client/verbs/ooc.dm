@@ -71,6 +71,9 @@ GLOBAL_VAR_INIT(normal_ooc_colour, "#002eb8")
 	var/keyname = key
 	if(ckey in GLOB.anonymize)
 		keyname = get_fake_key(ckey)
+
+	// Mirror OOC to the Discord bot bridge (no-op if DISCORD_BOT_URL unset).
+	send_bot_event("ooc", list("sender" = keyname, "message" = raw_msg))
 //	if(prefs.unlock_content)
 //		if(prefs.toggles & MEMBER_PUBLIC)
 //			keyname = "<font color='[prefs.ooccolor ? prefs.ooccolor : GLOB.normal_ooc_colour]'>[icon2html('icons/member_content.dmi', world, "blag")][keyname]</font>"
@@ -192,6 +195,9 @@ GLOBAL_VAR_INIT(normal_ooc_colour, "#002eb8")
 	var/keyname = key
 	if(ckey in GLOB.anonymize)
 		keyname = get_fake_key(ckey)
+
+	// Mirror OOC to the Discord bot bridge (no-op if DISCORD_BOT_URL unset).
+	send_bot_event("ooc", list("sender" = keyname, "message" = raw_msg))
 //	if(prefs.unlock_content)
 //		if(prefs.toggles & MEMBER_PUBLIC)
 //			keyname = "<font color='[prefs.ooccolor ? prefs.ooccolor : GLOB.normal_ooc_colour]'>[icon2html('icons/member_content.dmi', world, "blag")][keyname]</font>"

@@ -131,6 +131,7 @@
 
 	log_game("The round has ended.")
 	send_discord_webhook("**The round has ended!**")
+	send_bot_event("round", list("event" = "end"))
 
 	to_chat(world, "<BR><BR><BR><span class='reallybig'>So ends this tale on Ratwood Keep.</span>")
 	get_end_reason()
